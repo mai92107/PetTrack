@@ -1,7 +1,7 @@
-package domain
+package domainRepo
 
 import (
-	"context"
+	"PetTrack/core/model"
 
 	"github.com/google/uuid"
 	"gorm.io/gorm"
@@ -22,6 +22,17 @@ type PasswordRepository interface {
 }
 
 type DeviceRepository interface {
-	Create(deviceType string, memberId int64, deviceId string) (string, error)
-	GenerateDeviceId(ctx *context.Context) string
+	Create(deviceType string, memberId int64, deviceId string) error
+	GetDeviceList() ([]string, error)
+	FindDeviceById(deviceId string) (Device, error)
+}
+
+type TripRepository interface {
+	GetDeviceTrips(deviceId string, pageable model.Pageable) ([]TripSummary, int64, int64, error)
+	GetTripDetail(tripUuid string) (TripSummary, error)
+}
+
+type MemberDeviceRepository interface {
+	AddDevice(memberId int64, deviceId, deviceName string) error
+	GetMemberDeviceList(memberId int64) ([]string, error)
 }
