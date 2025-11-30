@@ -23,6 +23,22 @@ func NewRedisRepository(
 	return &redisServiceImpl{redis: client, redisUtil: redis}
 }
 
+func (s *redisServiceImpl) InitDeviceSequence(ctx context.Context) {
+	device_setting := s.redisUtil.HGetAllData(ctx, "device_setting")
+
+	prefix := "AA"
+	seq := 0
+
+	if len(device_setting) == 0 {
+		s.redisUtil.HSetData(ctx, "device_setting",
+			map[string]interface{}{
+				"device_prefix":   prefix,
+				"device_sequence": seq,
+			})
+	}
+	// logafa.Debug(" ✅ 成功初始化裝置設定")
+}
+
 func (s *redisServiceImpl) GenerateDeviceId(ctx context.Context) string {
 	prefix := s.redisUtil.HGetData(ctx, "device_setting", "device_prefix")
 	sequence, err := s.redis.HIncrBy(ctx, "device_setting", "device_sequence", 1).Result()

@@ -28,6 +28,7 @@ type CommonService interface {
 }
 
 type RedisService interface {
+	InitDeviceSequence(ctx context.Context)
 	GenerateDeviceId(ctx context.Context) string
 	GetOnlineDeviceList(ctx context.Context) ([]string, error)
 }

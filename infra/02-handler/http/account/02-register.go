@@ -2,6 +2,7 @@ package account
 
 import (
 	"PetTrack/core/global"
+	handler "PetTrack/infra/02-handler/http"
 	"PetTrack/infra/02-handler/request"
 	"net/http"
 )
@@ -22,7 +23,7 @@ func Register(ctx request.RequestContext) {
 		return
 	}
 	ip := ctx.GetClientIP()
-	loginInfo, err := accountService.Register(ip, req.Username, req.Password, req.Email, req.LastName, req.FirstName, req.NickName)
+	loginInfo, err := handler.AccountService.Register(ip, req.Username, req.Password, req.Email, req.LastName, req.FirstName, req.NickName)
 	if err != nil {
 		ctx.Error(http.StatusInternalServerError, global.COMMON_SYSTEM_ERROR)
 		return

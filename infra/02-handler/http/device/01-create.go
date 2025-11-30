@@ -3,6 +3,7 @@ package device
 import (
 	"PetTrack/core/global"
 	jwtUtil "PetTrack/core/util/jwt"
+	handler "PetTrack/infra/02-handler/http"
 	"PetTrack/infra/02-handler/request"
 	"net/http"
 )
@@ -24,7 +25,7 @@ func Create(ctx request.RequestContext) {
 		ctx.Error(http.StatusForbidden, "身份認證錯誤")
 		return
 	}
-	deviceId, err := deviceService.Create(req.DeviceType, userData.MemberId)
+	deviceId, err := handler.DeviceService.Create(req.DeviceType, userData.MemberId)
 	if err != nil {
 		// logafa.Error("裝置新增失敗，請稍後嘗試, error: %+v", err)
 		ctx.Error(http.StatusInternalServerError, global.COMMON_SYSTEM_ERROR)

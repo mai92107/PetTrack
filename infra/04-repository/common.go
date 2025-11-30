@@ -55,7 +55,7 @@ type memberDeviceRepoImpl struct {
 	db *gorm.DB
 }
 
-func NewDeviceMemberRepository(
+func NewMemberDeviceRepository(
 	db *gorm.DB,
 ) domainRepo.MemberDeviceRepository {
 	return &memberDeviceRepoImpl{db: db}

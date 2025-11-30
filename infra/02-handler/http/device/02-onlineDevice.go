@@ -3,6 +3,7 @@ package device
 import (
 	"PetTrack/core/global"
 	jwtUtil "PetTrack/core/util/jwt"
+	handler "PetTrack/infra/02-handler/http"
 	"PetTrack/infra/02-handler/request"
 	"net/http"
 )
@@ -15,7 +16,7 @@ func OnlineDeviceList(ctx request.RequestContext) {
 		ctx.Error(http.StatusForbidden, "身份認證錯誤")
 		return
 	}
-	deviceList, err := deviceService.OnlineDeviceList()
+	deviceList, err := handler.DeviceService.OnlineDeviceList()
 	if err != nil {
 		// logafa.Error("系統發生錯誤, error: %+v", err)
 		ctx.Error(http.StatusInternalServerError, global.COMMON_SYSTEM_ERROR)

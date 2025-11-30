@@ -4,6 +4,7 @@ import (
 	"PetTrack/infra/01-router/middleware"
 	"PetTrack/infra/02-handler/adapter"
 	"PetTrack/infra/02-handler/http/account"
+	test "PetTrack/infra/02-handler/http/checker"
 	"PetTrack/infra/02-handler/http/device"
 	"PetTrack/infra/02-handler/http/member"
 	"PetTrack/infra/02-handler/request"
@@ -23,7 +24,7 @@ func RegisterRoutes(r *gin.Engine) {
 	// 依類別分組
 	homeGroup := r.Group("/home")
 	{
-		homeGroup.GET("/say_hello")
+		homeGroup.GET("/say_hello", execute(test.SayHello))
 	}
 
 	accountGroup := r.Group("/account")
