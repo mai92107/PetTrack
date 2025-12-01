@@ -8,17 +8,15 @@ import (
 	"os"
 
 	"github.com/redis/go-redis/v9"
+	"go.mongodb.org/mongo-driver/mongo"
 )
 
 func Init() {
 
 	InitLogger()
-	// mongo, err := initMethod.InitMongo("localhost", "27017", "bunbun", "bunbun")
-	// if err != nil {
 
-	// 	return
-	// }
 	db := InitDB()
+	_ = InitMongo()
 	redis := InitRedis()
 	repos := InitRepositories(db, redis)
 	services := InitServices(repos, db, redis)
@@ -44,6 +42,14 @@ func InitDB() *bun.DB {
 		Write: db,
 		Read:  db,
 	}
+}
+
+func InitMongo() *mongo.Database {
+	mongo, err := initMethod.InitMongo("localhost", "27017", "bunbun", "bunbun")
+	if err != nil {
+		panic(err)
+	}
+	return mongo
 }
 
 func InitRedis() *redis.Client {
