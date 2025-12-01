@@ -1,6 +1,7 @@
 package main
 
 import (
+	"PetTrack/core/util/logafa"
 	initial "PetTrack/infra/00-init"
 	router "PetTrack/infra/01-router"
 	"context"
@@ -17,6 +18,11 @@ import (
 func main() {
 	initial.Init()
 
+	srv := initServer()
+	gracefulShutdown(srv)
+}
+
+func initServer() *http.Server {
 	r := gin.Default()
 	router.RegisterRoutes(r)
 
@@ -25,21 +31,20 @@ func main() {
 		Handler: r,
 	}
 
-	// ✅ 使用 goroutine 執行伺服器（非阻塞）
 	go func() {
 		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-			// logafa.Error("伺服器啟動失敗, error: %v", err)
+			logafa.Error("伺服器啟動失敗", "error", err)
 		}
 	}()
-	// ✅ 啟動優雅關閉邏輯
-	gracefulShutdown(srv)
+	return srv
+
 }
 
 func gracefulShutdown(srv *http.Server) {
 	quit := make(chan os.Signal, 1)
 	signal.Notify(quit, os.Interrupt, syscall.SIGTERM)
 	<-quit // 等待訊號
-	// logafa.Info("收到終止訊號，開始優雅關閉...")
+	logafa.Info("收到終止訊號，開始優雅關閉...")
 
 	// cron.CheckIsCronJobsFinished()
 
@@ -47,8 +52,8 @@ func gracefulShutdown(srv *http.Server) {
 	defer cancel()
 
 	if err := srv.Shutdown(ctx); err != nil {
-		// logafa.Error("伺服器優雅關閉失敗, %+v", err)
+		logafa.Error("伺服器優雅關閉失敗", "error", err)
 	} else {
-		// logafa.Info("伺服器成功關閉")
+		logafa.Info("伺服器成功關閉")
 	}
 }

@@ -13,7 +13,7 @@ func (service *AccountServiceImpl) Register(ip, username, password, email, lastN
 		return nil, err
 	}
 
-	tx := service.db.Begin()
+	tx := service.db.Write.Begin()
 
 	memberId, err := service.memberRepo.CreateMember(tx, lastName, firstName, nickName, email)
 	if err != nil {

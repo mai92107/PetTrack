@@ -40,17 +40,17 @@ func GenerateJwt(accountName, identity string, memberId int64, ip string, curren
 	return tokenStr, nil
 }
 
-func GetUserDataFromJwt(tokenStr string) (model.Claims, error) {
+func GetUserDataFromJwt(tokenStr string) (*model.Claims, error) {
 	claims := model.Claims{}
 	// Parse token with claims
 	token, err := jwt.ParseWithClaims(tokenStr, &claims, func(token *jwt.Token) (interface{}, error) {
 		return []byte(jwtKey), nil
 	})
 	if err != nil {
-		return model.Claims{}, fmt.Errorf("JWT 解析失敗: %w", err)
+		return nil, fmt.Errorf("JWT 解析失敗: %w", err)
 	}
 	if !token.Valid {
-		return model.Claims{}, fmt.Errorf("JWT 無效")
+		return nil, fmt.Errorf("JWT 無效")
 	}
-	return claims, nil
+	return &claims, nil
 }

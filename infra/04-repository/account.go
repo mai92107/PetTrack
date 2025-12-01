@@ -16,9 +16,9 @@ func (r *accountRepoImpl) FindByAccountName(accountName string) (*domain.Account
 	var err error
 
 	if strings.Contains(accountName, "@") {
-		err = r.db.First(&account, "username = ?", accountName).Error
+		err = r.read.First(&account, "username = ?", accountName).Error
 	} else {
-		err = r.db.First(&account, "email = ?", accountName).Error
+		err = r.read.First(&account, "email = ?", accountName).Error
 	}
 
 	if err != nil {
@@ -29,7 +29,7 @@ func (r *accountRepoImpl) FindByAccountName(accountName string) (*domain.Account
 }
 
 func (r *accountRepoImpl) UpdateLoginTime(uuid uuid.UUID) error {
-	err := r.db.Model(&domain.Account{}).Where("uuid = ?", uuid).Update("last_login_time", gorm.Expr("NOW()")).Error
+	err := r.write.Model(&domain.Account{}).Where("uuid = ?", uuid).Update("last_login_time", gorm.Expr("NOW()")).Error
 	if err != nil {
 		// logafa.Error("更新最後登入時間發生錯誤, error: %+v", err)
 		return fmt.Errorf("更新最後登入時間發生錯誤")
@@ -47,7 +47,7 @@ func (r *accountRepoImpl) Create(tx *gorm.DB, memberId int64, username, password
 		Identity:      model.MEMBER.ToString(),
 		LastLoginTime: global.GetNow(),
 	}
-	err := r.db.Create(&account).Error
+	err := r.write.Create(&account).Error
 	if err != nil {
 		if strings.Contains(err.Error(), "Duplicate entry") {
 			if strings.Contains(err.Error(), "username") {

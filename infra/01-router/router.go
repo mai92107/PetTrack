@@ -4,9 +4,9 @@ import (
 	"PetTrack/infra/01-router/middleware"
 	"PetTrack/infra/02-handler/adapter"
 	"PetTrack/infra/02-handler/http/account"
-	test "PetTrack/infra/02-handler/http/checker"
 	"PetTrack/infra/02-handler/http/device"
 	"PetTrack/infra/02-handler/http/member"
+	"PetTrack/infra/02-handler/http/test"
 	"PetTrack/infra/02-handler/request"
 
 	"github.com/gin-gonic/gin"
@@ -14,8 +14,8 @@ import (
 
 func RegisterRoutes(r *gin.Engine) {
 
-	const ADMIN = "ADMIN"
-	const MEMBER = "MEMBER"
+	const ADMIN = middleware.PermAdmin
+	const MEMBER = middleware.PermMember
 
 	r.Use(middleware.WorkerMiddleware())
 
@@ -24,34 +24,34 @@ func RegisterRoutes(r *gin.Engine) {
 	// 依類別分組
 	homeGroup := r.Group("/home")
 	{
-		homeGroup.GET("/say_hello", execute(test.SayHello))
+		homeGroup.GET("/say_hello", executeHttp(test.SayHello))
 	}
 
 	accountGroup := r.Group("/account")
 	{
-		accountGroup.POST("/login", execute(account.Login))
-		accountGroup.POST("/register", execute(account.Register))
+		accountGroup.POST("/login", executeHttp(account.Login))
+		accountGroup.POST("/register", executeHttp(account.Register))
 	}
 
 	deviceGroup := r.Group("/device")
 	{
-		deviceGroup.POST("/create", identityRequired(ADMIN), execute(device.Create))
+		deviceGroup.POST("/create", identityRequired(ADMIN), executeHttp(device.Create))
 		deviceGroup.POST("/recording", identityRequired(MEMBER), nil)
-		deviceGroup.GET("/onlineDevice", identityRequired(ADMIN), execute(device.OnlineDeviceList))
+		deviceGroup.GET("/onlineDevice", identityRequired(ADMIN), executeHttp(device.OnlineDeviceList))
 		deviceGroup.GET("/:deviceId/status", identityRequired(MEMBER), nil)
-		deviceGroup.GET("/all", identityRequired(ADMIN), execute(device.DeviceList))
+		deviceGroup.GET("/all", identityRequired(ADMIN), executeHttp(device.DeviceList))
 	}
 
 	tripGroup := r.Group("/trip")
 	{
-		tripGroup.GET("/tripList", identityRequired(MEMBER), execute(device.DeviceTrips))
-		tripGroup.GET("/trip", identityRequired(MEMBER), execute(device.TripDetail))
+		tripGroup.GET("/tripList", identityRequired(MEMBER), executeHttp(device.DeviceTrips))
+		tripGroup.GET("/trip", identityRequired(MEMBER), executeHttp(device.TripDetail))
 	}
 
 	memberGroup := r.Group("/member")
 	{
-		memberGroup.POST("/addDevice", identityRequired(MEMBER), execute(member.AddDevice))
-		memberGroup.GET("/allDevice", identityRequired(MEMBER), execute(member.MemberDeviceList))
+		memberGroup.POST("/addDevice", identityRequired(MEMBER), executeHttp(member.AddDevice))
+		memberGroup.GET("/allDevice", identityRequired(MEMBER), executeHttp(member.MemberDeviceList))
 	}
 
 	systemGroup := r.Group("/system")
@@ -60,13 +60,13 @@ func RegisterRoutes(r *gin.Engine) {
 	}
 }
 
-func execute(handler func(request.RequestContext)) gin.HandlerFunc {
+func executeHttp(handler func(request.RequestContext)) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		ctx := adapter.NewHttpContext(c)
 		handler(ctx)
 	}
 }
 
-func identityRequired(identity string) gin.HandlerFunc {
-	return middleware.JWTValidator(identity)
+func identityRequired(identity middleware.Permission) gin.HandlerFunc {
+	return middleware.JWTMiddleware(identity)
 }

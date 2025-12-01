@@ -1,25 +1,24 @@
 package account
 
 import (
+	bun "PetTrack/core/model/bunMachines"
 	domainRepo "PetTrack/domain/repo"
 	domainService "PetTrack/domain/service"
-
-	"gorm.io/gorm"
 )
 
 type AccountServiceImpl struct {
 	accountRepo     domainRepo.AccountRepository
 	memberRepo      domainRepo.MemberRepository
 	passwordHistory domainRepo.PasswordRepository
-	db              *gorm.DB
+	db              *bun.DB
 }
 
 func NewAccountService(
-	db *gorm.DB, 
-	passwordHistory domainRepo.PasswordRepository, 
-	accountRepo domainRepo.AccountRepository, 
+	db *bun.DB,
+	passwordHistory domainRepo.PasswordRepository,
+	accountRepo domainRepo.AccountRepository,
 	memberRepo domainRepo.MemberRepository,
-	) domainService.AccountService {
+) domainService.AccountService {
 	return &AccountServiceImpl{
 		db:              db,
 		passwordHistory: passwordHistory,

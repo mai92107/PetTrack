@@ -13,7 +13,7 @@ func (r *tripRepoImpl) GetDeviceTrips(deviceId string, pageable model.Pageable) 
 	var totalPage int64
 
 	// 查總筆數
-	if err := r.db.Model(&domainRepo.TripSummary{}).
+	if err := r.read.Model(&domainRepo.TripSummary{}).
 		Where("device_id = ?", deviceId).
 		Count(&totalCount).Error; err != nil {
 		// logafa.Error("統計裝置行程數量失敗 deviceId=%s, error: %+v", deviceId, err)
@@ -29,7 +29,7 @@ func (r *tripRepoImpl) GetDeviceTrips(deviceId string, pageable model.Pageable) 
 	totalPage = int64(math.Ceil(float64(totalCount) / float64(pageable.Size)))
 
 	// 2. 正式查詢資料（分頁 + 排序）
-	err := r.db.Where("device_id = ?", deviceId).
+	err := r.read.Where("device_id = ?", deviceId).
 		Offset(pageable.Offset()).    // 分頁
 		Limit(pageable.Limit()).      // 每頁筆數
 		Order(pageable.OrderBySQL()). // 排序
@@ -46,7 +46,7 @@ func (r *tripRepoImpl) GetDeviceTrips(deviceId string, pageable model.Pageable) 
 func (r *tripRepoImpl) GetTripDetail(tripUuid string) (domainRepo.TripSummary, error) {
 	var trip domainRepo.TripSummary
 
-	err := r.db.Where("data_ref = ?", tripUuid).
+	err := r.read.Where("data_ref = ?", tripUuid).
 		First(&trip).Error
 	if err != nil {
 		// logafa.Error("查詢裝置行程失敗 data_ref=%s, error: %+v", tripUuid, err)

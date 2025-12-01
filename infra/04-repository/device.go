@@ -15,7 +15,7 @@ func (r *deviceRepoImpl) Create(deviceType string, memberId int64, deviceId stri
 		DeviceType:     deviceType,
 		CreateByMember: memberId,
 	}
-	err := r.db.Table("device").Create(&device).Error
+	err := r.write.Table("device").Create(&device).Error
 	if err != nil {
 		// logafa.Error("建立裝置資料失敗, error: %+v", err)
 		return fmt.Errorf("建立裝置資料失敗")
@@ -25,7 +25,7 @@ func (r *deviceRepoImpl) Create(deviceType string, memberId int64, deviceId stri
 
 func (r *deviceRepoImpl) GetDeviceList() ([]string, error) {
 	var deviceIds []string
-	err := r.db.Model(&domainRepo.Device{}).
+	err := r.read.Model(&domainRepo.Device{}).
 		Pluck("device_id", &deviceIds).Error
 	if err != nil {
 		// logafa.Error("查詢所有 deviceIds 失敗, error: %+v", err)
@@ -36,7 +36,7 @@ func (r *deviceRepoImpl) GetDeviceList() ([]string, error) {
 
 func (r *deviceRepoImpl) FindDeviceById(deviceId string) (domainRepo.Device, error) {
 	device := domainRepo.Device{}
-	err := r.db.First(&device, "device_id = ?", deviceId).Error
+	err := r.read.First(&device, "device_id = ?", deviceId).Error
 	if err != nil {
 		// logafa.Error("查無此裝置, error: %+v", err)
 		return device, fmt.Errorf("查無此裝置")

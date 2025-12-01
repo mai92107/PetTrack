@@ -1,6 +1,7 @@
 package repo
 
 import (
+	bun "PetTrack/core/model/bunMachines"
 	domain "PetTrack/domain/repo"
 	domainRepo "PetTrack/domain/repo"
 
@@ -8,55 +9,67 @@ import (
 )
 
 type accountRepoImpl struct {
-	db *gorm.DB
+	write *gorm.DB
+	read  *gorm.DB
 }
 
-func NewAccountRepository(db *gorm.DB) domain.AccountRepository {
-	return &accountRepoImpl{db: db}
+func NewAccountRepository(
+	db *bun.DB,
+) domain.AccountRepository {
+	return &accountRepoImpl{write: db.Write, read: db.Read}
 }
 
 type memberRepoImpl struct {
-	db *gorm.DB
+	write *gorm.DB
+	read  *gorm.DB
 }
 
-func NewMemberRepository(db *gorm.DB) domain.MemberRepository {
-	return &memberRepoImpl{db: db}
+func NewMemberRepository(
+	db *bun.DB,
+) domain.MemberRepository {
+	return &memberRepoImpl{write: db.Write, read: db.Read}
 }
 
 type passwordRepoImpl struct {
-	db *gorm.DB
+	write *gorm.DB
+	read  *gorm.DB
 }
 
-func NewPasswordRepository(db *gorm.DB) domain.PasswordRepository {
-	return &passwordRepoImpl{db: db}
+func NewPasswordRepository(
+	db *bun.DB,
+) domain.PasswordRepository {
+	return &passwordRepoImpl{write: db.Write, read: db.Read}
 }
 
 type deviceRepoImpl struct {
-	db *gorm.DB
+	write *gorm.DB
+	read  *gorm.DB
 }
 
 func NewDeviceRepository(
-	db *gorm.DB,
+	db *bun.DB,
 ) domainRepo.DeviceRepository {
-	return &deviceRepoImpl{db: db}
+	return &deviceRepoImpl{write: db.Write, read: db.Read}
 }
 
 type tripRepoImpl struct {
-	db *gorm.DB
+	write *gorm.DB
+	read  *gorm.DB
 }
 
 func NewTripRepository(
-	db *gorm.DB,
+	db *bun.DB,
 ) domainRepo.TripRepository {
-	return &tripRepoImpl{db: db}
+	return &tripRepoImpl{write: db.Write, read: db.Read}
 }
 
 type memberDeviceRepoImpl struct {
-	db *gorm.DB
+	write *gorm.DB
+	read  *gorm.DB
 }
 
 func NewMemberDeviceRepository(
-	db *gorm.DB,
+	db *bun.DB,
 ) domainRepo.MemberDeviceRepository {
-	return &memberDeviceRepoImpl{db: db}
+	return &memberDeviceRepoImpl{write: db.Write, read: db.Read}
 }
