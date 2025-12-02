@@ -52,7 +52,6 @@ func executeJob(c *cron.Cron, cronType CronType, jobs []func(context.Context)) {
 
 	c.AddFunc(cronSpecs[cronType].spec, func() {
 		start := time.Now()
-		logafa.Debug("", "執行程序", cronSpecs[cronType].infoName, "現在時間", start.Format(TIME_LAYOUT))
 
 		var localWg sync.WaitGroup
 		for _, job := range jobs {
@@ -60,7 +59,7 @@ func executeJob(c *cron.Cron, cronType CronType, jobs []func(context.Context)) {
 		}
 		localWg.Wait()
 		duration := time.Since(start)
-		logafa.Debug("", "任務執行完畢", cronSpecs[cronType].infoName, "耗時", duration)
+		logafa.Debug("任務執行完畢", "類別", cronSpecs[cronType].infoName, "耗時", duration)
 	})
 }
 

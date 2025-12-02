@@ -1,3 +1,4 @@
+# Ingore log files
 log/
 
 # Ignore everything inside docker/
