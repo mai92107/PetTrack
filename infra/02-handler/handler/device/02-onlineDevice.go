@@ -3,35 +3,24 @@ package device
 import (
 	"PetTrack/core/global"
 	jwtUtil "PetTrack/core/util/jwt"
-	handler "PetTrack/infra/02-handler/http"
+	handler "PetTrack/infra/02-handler/handler"
 	"PetTrack/infra/02-handler/request"
 	"net/http"
 )
 
-type request07 struct {
-	DeviceId string `json:"deviceId"`
-	TripUuid string `json:"tripUuid"`
-}
-
-func TripDetail(ctx request.RequestContext) {
-	var req request07
-	err := ctx.BindJSON(&req)
-	if err != nil {
-		ctx.Error(http.StatusBadRequest, global.COMMON_REQUEST_ERROR)
-		return
-	}
+func OnlineDeviceList(ctx request.RequestContext) {
 	jwt := ctx.GetJWT()
 	userInfo, err := jwtUtil.GetUserDataFromJwt(jwt)
-	if err != nil {
+	if err != nil || userInfo.Identity != "ADMIN" {
 		// logafa.Error("身份認證錯誤, error: %+v", err)
 		ctx.Error(http.StatusForbidden, "身份認證錯誤")
 		return
 	}
-	info, err := handler.DeviceService.GetTripDetail(*userInfo, req.DeviceId, req.TripUuid)
+	deviceList, err := handler.DeviceService.OnlineDeviceList()
 	if err != nil {
 		// logafa.Error("系統發生錯誤, error: %+v", err)
 		ctx.Error(http.StatusInternalServerError, global.COMMON_SYSTEM_ERROR)
 		return
 	}
-	ctx.Success(info)
+	ctx.Success(deviceList)
 }

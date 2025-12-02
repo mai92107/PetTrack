@@ -1,4 +1,4 @@
-package device
+package trip
 
 import (
 	"PetTrack/core/model"
@@ -6,7 +6,7 @@ import (
 	"fmt"
 )
 
-func (s *DeviceServiceImpl) GetDeviceTrips(member model.Claims, deviceId string, pageable model.Pageable) ([]map[string]interface{}, int64, int64, error) {
+func (s *TripServiceImpl) GetDeviceTrips(member model.Claims, deviceId string, pageable model.Pageable) ([]map[string]interface{}, int64, int64, error) {
 	trips := []map[string]interface{}{}
 	var total int64
 	var totalPages int64

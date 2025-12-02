@@ -2,7 +2,7 @@ package member
 
 import (
 	"PetTrack/core/global"
-	handler "PetTrack/infra/02-handler/http"
+	handler "PetTrack/infra/02-handler/handler"
 	"PetTrack/infra/02-handler/request"
 	"net/http"
 )

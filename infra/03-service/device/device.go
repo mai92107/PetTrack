@@ -9,19 +9,16 @@ type DeviceServiceImpl struct {
 	deviceRepo    domainRepo.DeviceRepository
 	tripRepo      domainRepo.TripRepository
 	redisService  domainService.RedisService
-	commonService domainService.CommonService
 }
 
 func NewDeviceService(
 	deviceRepo domainRepo.DeviceRepository,
 	tripRepo domainRepo.TripRepository,
 	redisService domainService.RedisService,
-	commonService domainService.CommonService,
 ) domainService.DeviceService {
 	return &DeviceServiceImpl{
 		deviceRepo:    deviceRepo,
 		tripRepo:      tripRepo,
 		redisService:  redisService,
-		commonService: commonService,
 	}
 }

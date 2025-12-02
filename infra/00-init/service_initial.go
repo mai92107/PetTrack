@@ -7,6 +7,7 @@ import (
 	"PetTrack/infra/03-service/account"
 	"PetTrack/infra/03-service/device"
 	"PetTrack/infra/03-service/member"
+	"PetTrack/infra/03-service/trip"
 
 	"github.com/redis/go-redis/v9"
 )
@@ -17,6 +18,7 @@ type Services struct {
 	Member  domainService.MemberService
 	Common  domainService.CommonService
 	Redis   domainService.RedisService
+	Trip    domainService.TripService
 }
 
 func InitServices(repo *Repositories, db *bun.DB, redis *redis.Client) *Services {
@@ -25,8 +27,9 @@ func InitServices(repo *Repositories, db *bun.DB, redis *redis.Client) *Services
 
 	return &Services{
 		Account: account.NewAccountService(db, repo.Password, repo.Account, repo.Member),
-		Device:  device.NewDeviceService(repo.Device, repo.Trip, redisService, commonService),
+		Device:  device.NewDeviceService(repo.Device, repo.Trip, redisService),
 		Member:  member.NewMemberService(repo.Device, repo.MemberDevice),
+		Trip:    trip.NewTripService(repo.Trip, commonService, repo.Redis),
 		Common:  commonService,
 		Redis:   redisService,
 	}

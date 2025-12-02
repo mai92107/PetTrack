@@ -6,6 +6,7 @@ import (
 	"log/slog"
 	"os"
 	"runtime"
+	"strings"
 	"time"
 
 	"github.com/fatih/color"
@@ -14,32 +15,36 @@ import (
 type LogLevel slog.Level
 
 var (
-	CurrentLevel = slog.LevelDebug
-	LogFile      *os.File
+	LogFile *os.File
 )
 
 type LogafaHandler struct {
-	level   slog.Leveler
-	console *os.File
+	handler slog.Handler // 內部用官方 handler 輸出結構化
 }
 
-func NewColorHandler(level slog.Leveler, console *os.File) *LogafaHandler {
+func NewLogafaHandler(opts *slog.HandlerOptions) *LogafaHandler {
+	if opts == nil {
+		opts = &slog.HandlerOptions{Level: slog.LevelDebug}
+	}
+	// 讓官方 handler 幫我們加 source（它會正確抓 caller）
+	opts.AddSource = true
+
 	return &LogafaHandler{
-		level:   level,
-		console: console,
+		handler: slog.NewTextHandler(os.Stdout, opts), // 或 NewJSONHandler
 	}
 }
 
-func (h *LogafaHandler) Enabled(_ context.Context, lvl slog.Level) bool {
-	return lvl >= h.level.Level()
+func (h *LogafaHandler) Enabled(ctx context.Context, level slog.Level) bool {
+	return h.handler.Enabled(ctx, level)
 }
 
 func (h *LogafaHandler) Handle(_ context.Context, r slog.Record) error {
 	// timestamp
-	timestamp := time.Now().Format("2006-01-02 15:04:05")
-
-	// get source (file + line)
-	file, line := getSource(r.PC)
+	location := "unknown:0"
+	if r.PC != 0 {
+		frame, _ := runtime.CallersFrames([]uintptr{r.PC}).Next()
+		location = fmt.Sprintf("%s:%d", frame.File, frame.Line)
+	}
 
 	// --- 1. 彩色 Console ---
 	var colorize *color.Color
@@ -54,9 +59,6 @@ func (h *LogafaHandler) Handle(_ context.Context, r slog.Record) error {
 		colorize = color.New(color.FgRed)
 	}
 
-	// message
-	msg := r.Message
-
 	// Attributes
 	attrs := ""
 	r.Attrs(func(a slog.Attr) bool {
@@ -65,57 +67,79 @@ func (h *LogafaHandler) Handle(_ context.Context, r slog.Record) error {
 	})
 
 	// Console(彩色)
-	consoleLine := fmt.Sprintf("[%s] [%s] [%s:%d] %s%s\n",
-		timestamp,
-		r.Level.String(),
-		file, line,
-		colorize.Sprint(msg),
+	consoleLine := fmt.Sprintf("[%s] [%s] [%s] %s%s\n",
+		time.Now().Format("2006-01-02 15:04:05"),
+		levelString(r.Level),
+		location,
+		colorize.Sprint(r.Message),
 		attrs,
 	)
-	_, _ = h.console.Write([]byte(consoleLine))
+	_, _ = os.Stdout.WriteString(consoleLine)
 
 	// --- 3. 寫入檔案（乾淨格式） ---
 	if LogFile != nil {
-		fileLine := fmt.Sprintf("time=%s level=%s msg=%q %s file=%q line=%d\n",
-			time.Now().Format(time.RFC3339),
-			r.Level.String(),
-			msg,
+		fileLine := fmt.Sprintf("time=%s level=%s msg=%q file=%q line=%d%s\n",
+			r.Time.Format(time.RFC3339),
+			levelString(r.Level),
+			r.Message,
+			location,
+			r.Time.UnixNano()/1e6, // optional: 毫秒
 			attrs,
-			file,
-			line,
 		)
-		_, _ = LogFile.Write([]byte(fileLine))
+		LogFile.WriteString(fileLine)
 	}
 
 	return nil
 }
 
 func (h *LogafaHandler) WithAttrs(attrs []slog.Attr) slog.Handler {
-	return h
+	return &LogafaHandler{handler: h.handler.WithAttrs(attrs)}
 }
 
 func (h *LogafaHandler) WithGroup(name string) slog.Handler {
-	return h
+	return &LogafaHandler{handler: h.handler.WithGroup(name)}
 }
 
-func Debug(format string, args ...any) {
-	slog.Debug(format, args...)
-}
-func Info(format string, args ...any) {
-	slog.Info(format, args...)
-}
-func Warn(format string, args ...any) {
-	slog.Warn(format, args...)
-}
-func Error(format string, args ...any) {
-	slog.Error(format, args...)
-}
+func Debug(msg string, args ...any) { logf(slog.LevelDebug, msg, args...) }
+func Info(msg string, args ...any)  { logf(slog.LevelInfo, msg, args...) }
+func Warn(msg string, args ...any)  { logf(slog.LevelWarn, msg, args...) }
+func Error(msg string, args ...any) { logf(slog.LevelError, msg, args...) }
 
-func getSource(pc uintptr) (file string, line int) {
-	fn := runtime.FuncForPC(pc)
-	if fn == nil {
-		return "unknown", 0
+func logf(level slog.Level, msg string, args ...any) {
+	if !slog.Default().Enabled(context.Background(), level) {
+		return
 	}
-	file, line = fn.FileLine(pc)
-	return
+
+	var pc uintptr
+	var pcs [1]uintptr
+	runtime.Callers(3, pcs[:]) // 跳過：logf → Info/Debug → 真正呼叫處
+	pc = pcs[0]
+
+	r := slog.NewRecord(time.Now(), level, msg, pc)
+	r.Add(args...)
+
+	_ = slog.Default().Handler().Handle(context.Background(), r)
+}
+
+// 取代這行：r.Level.String()[5:]
+func levelString(l slog.Level) string {
+	switch l {
+	case slog.LevelDebug:
+		return "DEBUG"
+	case slog.LevelInfo:
+		return "INFO"
+	case slog.LevelWarn:
+		return "WARN"
+	case slog.LevelError:
+		return "ERROR"
+	default:
+		// 處理自訂 level，例如 DEBUG+4 → DEBUG+4
+		s := l.String()
+		if len(s) > 5 && s[:5] == "Level" {
+			// 舊版格式：Level(12) → 12
+			return fmt.Sprintf("%d", l)
+		}
+		// 新版格式：直接回傳 DEBUG+4 之類的
+		return strings.ToUpper(s)
+	}
 }

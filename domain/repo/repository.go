@@ -30,6 +30,9 @@ type DeviceRepository interface {
 type TripRepository interface {
 	GetDeviceTrips(deviceId string, pageable model.Pageable) ([]TripSummary, int64, int64, error)
 	GetTripDetail(tripUuid string) (TripSummary, error)
+	SaveLocationToDB(records []DeviceLocation) error
+	ReadTripFromMongo(timeDuration int) ([]TripSummary, error)
+	SaveTripToDB(results []TripSummary) error
 }
 
 type MemberDeviceRepository interface {

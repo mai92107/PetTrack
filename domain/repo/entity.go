@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 type Account struct {
@@ -78,10 +79,50 @@ type TripSummary struct {
 	PointCount      int       `gorm:"column:point_count;type:int;default:0;comment:'GPS點數量'" bson:"point_count"`
 	DistanceKM      float64   `gorm:"column:distance_km;type:decimal(10,3);default:0.000;index:idx_distance;comment:'總距離(km)'" bson:"distance_km"`
 
-	CreatedAt 		time.Time `gorm:"column:created_at"`
-	UpdatedAt 		time.Time `gorm:"column:updated_at"`
+	CreatedAt time.Time `gorm:"column:created_at"`
+	UpdatedAt time.Time `gorm:"column:updated_at"`
 }
 
 func (d *TripSummary) TableName() string {
 	return "trip_summary"
+}
+
+type GPS struct {
+	DeviceId   string    `json:"deviceId"`
+	Longitude  float64   `json:"lng"`
+	Latitude   float64   `json:"lat"`
+	RecordTime time.Time `json:"time"`
+	DataRef    string    `json:"dataRef"`
+}
+
+// GeoJSONPoint 地理位置點
+type GeoJSONPoint struct {
+	Type        string     `bson:"type" json:"type"`               // 固定為 "Point"
+	Coordinates [2]float64 `bson:"coordinates" json:"coordinates"` // [經度, 緯度] - 必須是 float64!
+}
+
+// DeviceLocation MongoDB 裝置位置記錄
+type DeviceLocation struct {
+	ID         primitive.ObjectID `bson:"_id,omitempty" json:"id"`
+	DeviceID   string             `bson:"device_id" json:"device_id"`
+	Location   GeoJSONPoint       `bson:"location" json:"location"`
+	RecordedAt time.Time          `bson:"recorded_at" json:"recorded_at"` // 改用 time.Time
+	CreatedAt  time.Time          `bson:"created_at" json:"created_at"`
+	DataRef    string             `bson:"data_ref" json:"data_ref"`
+}
+
+// NewGeoJSONPoint 建立 GeoJSON Point
+func NewGeoJSONPoint(lng, lat float64) GeoJSONPoint {
+	return GeoJSONPoint{
+		Type:        "Point",
+		Coordinates: [2]float64{lng, lat}, // MongoDB GeoJSON 順序: [經度, 緯度]
+	}
+}
+
+type RawTrip struct {
+	DataRef   string      `bson:"data_ref"`
+	DeviceID  string      `bson:"device_id"`
+	StartTime time.Time   `bson:"start_time"`
+	EndTime   time.Time   `bson:"end_time"`
+	Coords    [][]float64 `bson:"coords"` // [[lng, lat], [lng, lat], ...]
 }

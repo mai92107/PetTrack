@@ -5,10 +5,11 @@ import (
 	"PetTrack/core/util/logafa"
 	"PetTrack/infra/01-router/middleware"
 	"PetTrack/infra/02-handler/adapter"
-	"PetTrack/infra/02-handler/http/account"
-	"PetTrack/infra/02-handler/http/device"
-	"PetTrack/infra/02-handler/http/member"
-	"PetTrack/infra/02-handler/http/test"
+	"PetTrack/infra/02-handler/handler/account"
+	"PetTrack/infra/02-handler/handler/device"
+	"PetTrack/infra/02-handler/handler/member"
+	"PetTrack/infra/02-handler/handler/test"
+	"PetTrack/infra/02-handler/handler/trip"
 	"PetTrack/infra/02-handler/request"
 	"PetTrack/infra/02-handler/response"
 	"fmt"
@@ -51,6 +52,8 @@ var mqttRoutes = map[string]Route{
 	"member_addDevice": {Handler: executeMqtt(member.AddDevice), Permission: PermMember},
 	"device_status":    {Handler: nil, Permission: PermMember},
 	"member_devices":   {Handler: executeMqtt(member.MemberDeviceList), Permission: PermMember},
+	"trip_list":        {Handler: executeMqtt(trip.DeviceTrips), Permission: PermMember},
+	"trip":             {Handler: executeMqtt(trip.TripDetail), Permission: PermMember},
 }
 
 // topic sample : req/action/clientId/jwt/ip

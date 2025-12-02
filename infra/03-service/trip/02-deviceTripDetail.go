@@ -1,4 +1,4 @@
-package device
+package trip
 
 import (
 	"PetTrack/core/model"
@@ -6,7 +6,7 @@ import (
 	"fmt"
 )
 
-func (s *DeviceServiceImpl) GetTripDetail(member model.Claims, deviceId string, tripUuid string) (map[string]interface{}, error) {
+func (s *TripServiceImpl) GetTripDetail(member model.Claims, deviceId string, tripUuid string) (map[string]interface{}, error) {
 	trip := map[string]interface{}{}
 
 	err := validateTripDetailRequest(deviceId, tripUuid)

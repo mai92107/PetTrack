@@ -1,13 +1,20 @@
 package cron
 
-import "github.com/robfig/cron/v3"
+import (
+	"PetTrack/core/util/logafa"
+	domainService "PetTrack/domain/service"
+
+	"github.com/robfig/cron/v3"
+)
 
 type Scheduler struct {
-	// tripService service.TripService
+	tripService domainService.TripService
 }
 
-func NewScheduler() *Scheduler {
-	return &Scheduler{}
+func NewScheduler(
+	tripService domainService.TripService,
+) *Scheduler {
+	return &Scheduler{tripService: tripService}
 }
 
 func (s *Scheduler) CronStart() {
@@ -27,12 +34,12 @@ func (s *Scheduler) CronStart() {
 	})
 	// 每5分鐘執行一次
 	executeJob(c, Five, []func(){
-		// persist.SaveGpsFmRdsToMongo,
+		s.tripService.SaveGpsFmRdsToMongo,
 	})
 
 	// 每10分鐘執行一次
 	executeJob(c, Ten, []func(){
-		// persist.SaveTripFmMongoToMaria,
+		func() { s.tripService.FlushTripFmMongoToMaria(30) },
 	})
 
 	// 每15分鐘執行一次
@@ -51,7 +58,7 @@ func (s *Scheduler) CronStart() {
 
 	// 每天執行一次（每日00:00）
 	executeJob(c, Day, []func(){
-		// logafa.StartRotateFile,
+		logafa.StartRotateFile,
 	})
 
 	c.Start()

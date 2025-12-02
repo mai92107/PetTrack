@@ -12,10 +12,15 @@ func (s *DeviceServiceImpl) Create(deviceType string, memberId int64) (string, e
 	}
 	// TODO: 暫時用background
 	ctx := context.Background()
-	deviceId = s.redisService.GenerateDeviceId(ctx)
-	// 取得用戶資料
-	err := s.deviceRepo.Create(deviceType, memberId, deviceId)
-	return deviceId, err
+	deviceId, err := s.redisService.GenerateDeviceId(ctx)
+	if err != nil {
+		return "", err
+	}
+	err = s.deviceRepo.Create(deviceType, memberId, deviceId)
+	if err != nil {
+		return "", err
+	}
+	return deviceId, nil
 }
 
 func validateRequest(deviceType string) error {
