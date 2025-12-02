@@ -4,6 +4,7 @@ import (
 	"PetTrack/infra/00-core/global"
 	"PetTrack/infra/00-core/model"
 	jwtUtil "PetTrack/infra/00-core/util/jwt"
+	"PetTrack/infra/00-core/util/logafa"
 	handler "PetTrack/infra/02-handler/handler"
 	"PetTrack/infra/02-handler/request"
 	"PetTrack/infra/02-handler/response"
@@ -25,13 +26,13 @@ func DeviceTrips(ctx request.RequestContext) {
 	jwt := ctx.GetJWT()
 	userInfo, err := jwtUtil.GetUserDataFromJwt(jwt)
 	if err != nil {
-		// logafa.Error("身份認證錯誤, error: %+v", err)
+		logafa.Error("身份認證錯誤", "error", err)
 		ctx.Error(http.StatusForbidden, "身份認證錯誤")
 		return
 	}
 	datas, total, totalPages, err := handler.TripService.GetDeviceTrips(ctx.GetContext(), *userInfo, req.DeviceId, model.NewPageable(&req.Page, &req.Size, req.Direction, req.OrderBy))
 	if err != nil {
-		// logafa.Error("系統發生錯誤, error: %+v", err)
+		logafa.Error("系統發生錯誤", "error", err)
 		ctx.Error(http.StatusInternalServerError, global.COMMON_SYSTEM_ERROR)
 		return
 	}

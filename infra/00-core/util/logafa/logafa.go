@@ -78,13 +78,12 @@ func (h *LogafaHandler) Handle(_ context.Context, r slog.Record) error {
 
 	// --- 3. 寫入檔案（乾淨格式） ---
 	if LogFile != nil {
-		fileLine := fmt.Sprintf("time=%s level=%s msg=%q file=%q line=%d%s\n",
+		fileLine := fmt.Sprintf("time=%s level=%s msg=%q %s file=%q \n",
 			r.Time.Format(time.RFC3339),
 			levelString(r.Level),
 			r.Message,
-			location,
-			r.Time.UnixNano()/1e6, // optional: 毫秒
 			attrs,
+			location,
 		)
 		LogFile.WriteString(fileLine)
 	}
@@ -121,7 +120,6 @@ func logf(level slog.Level, msg string, args ...any) {
 	_ = slog.Default().Handler().Handle(context.Background(), r)
 }
 
-// 取代這行：r.Level.String()[5:]
 func levelString(l slog.Level) string {
 	switch l {
 	case slog.LevelDebug:

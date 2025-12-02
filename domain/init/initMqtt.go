@@ -45,7 +45,7 @@ func InitMosquitto(host, port, username, password string, handler mqtt.MessageHa
 	client := mqtt.NewClient(opts)
 
 	// 初次連線
-	logafa.Debug("🔌 正在連接到 MQTT Broker: %s:%s...", host, port)
+	logafa.Debug("🔌 正在連接到 MQTT Broker", "host", host, "port", port)
 
 	// 初次連線（非阻塞）
 	if token := client.Connect(); token.WaitTimeout(30*time.Second) && token.Error() != nil {

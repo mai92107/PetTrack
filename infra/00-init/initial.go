@@ -49,7 +49,6 @@ func InitWorkers() {
 func InitLogger() {
 	logafa.CreateLogFileNow()
 
-	// 初始化（全專案只需要呼叫一次）
 	handler := logafa.NewLogafaHandler(&slog.HandlerOptions{
 		Level:     slog.LevelDebug,
 		AddSource: true,
@@ -91,5 +90,7 @@ func InitRedis() *redis.Client {
 }
 
 func InitMosquitto() mqtt.Client {
-	return initMethod.InitMosquitto("mqttgo.io", "1883", "", "", router.OnMessageReceived, []string{"req/+/+/+/+"})
+	client := initMethod.InitMosquitto("mqttgo.io", "1883", "", "", router.OnMessageReceived, []string{"req/+/+/+/+"})
+	logafa.Debug("MQTT 初始化完成")
+	return client
 }

@@ -2,9 +2,9 @@
 package middleware
 
 import (
-	"PetTrack/infra/00-core/util/logafa"
 	"PetTrack/infra/00-core/model"
 	jwtUtil "PetTrack/infra/00-core/util/jwt"
+	"PetTrack/infra/00-core/util/logafa"
 	"errors"
 	"net/http"
 	"strings"
@@ -53,6 +53,9 @@ func JWTMiddleware(required Permission) gin.HandlerFunc {
 }
 
 func ValidateJWT(jwt string, required Permission) (*model.Claims, error) {
+	if required == PermGuest {
+		return nil, nil
+	}
 
 	if jwt == "" {
 		return nil, ErrMissingToken

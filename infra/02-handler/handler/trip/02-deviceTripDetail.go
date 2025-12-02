@@ -3,6 +3,7 @@ package trip
 import (
 	"PetTrack/infra/00-core/global"
 	jwtUtil "PetTrack/infra/00-core/util/jwt"
+	"PetTrack/infra/00-core/util/logafa"
 	handler "PetTrack/infra/02-handler/handler"
 	"PetTrack/infra/02-handler/request"
 	"net/http"
@@ -23,13 +24,13 @@ func TripDetail(ctx request.RequestContext) {
 	jwt := ctx.GetJWT()
 	userInfo, err := jwtUtil.GetUserDataFromJwt(jwt)
 	if err != nil {
-		// logafa.Error("身份認證錯誤, error: %+v", err)
+		logafa.Error("身份認證錯誤", "error", err)
 		ctx.Error(http.StatusForbidden, "身份認證錯誤")
 		return
 	}
 	info, err := handler.TripService.GetTripDetail(ctx.GetContext(), *userInfo, req.DeviceId, req.TripUuid)
 	if err != nil {
-		// logafa.Error("系統發生錯誤, error: %+v", err)
+		logafa.Error("系統發生錯誤", "error", err)
 		ctx.Error(http.StatusInternalServerError, global.COMMON_SYSTEM_ERROR)
 		return
 	}
