@@ -3,6 +3,7 @@ package middleware
 import (
 	"PetTrack/infra/00-core/global"
 	"PetTrack/infra/00-core/util/logafa"
+	"PetTrack/infra/02-handler/response"
 	"context"
 	"net/http"
 	"time"
@@ -28,10 +29,9 @@ func WorkerMiddleware() gin.HandlerFunc {
 // 為每個 request 套用 timeout
 func TimeoutMiddleware(timeout time.Duration) gin.HandlerFunc {
 	return func(c *gin.Context) {
-
+		now := global.GetNow()
 		// 建立可取消 context
 		ctx, cancel := context.WithTimeout(c.Request.Context(), timeout)
-		defer cancel()
 
 		// 將新的 context 放進 request
 		c.Request = c.Request.WithContext(ctx)
@@ -48,8 +48,9 @@ func TimeoutMiddleware(timeout time.Duration) gin.HandlerFunc {
 				}
 			}()
 
-			c.Next()        // 執行 handler / middleware
-			close(finished) // handler 正常完成
+			c.Next()
+			close(finished)
+			cancel()
 		}()
 
 		// 用 select 監控三種結果
@@ -64,11 +65,7 @@ func TimeoutMiddleware(timeout time.Duration) gin.HandlerFunc {
 
 		case <-ctx.Done():
 			// timeout，取消 handler 實作
-			c.JSON(http.StatusGatewayTimeout, gin.H{
-				"error":   "request timeout",
-				"timeout": timeout.String(),
-			})
-
+			response.Error(c, http.StatusGatewayTimeout, now, "系統處理超時")
 			// 終止 request chain
 			c.Abort()
 			return

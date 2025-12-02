@@ -22,27 +22,33 @@ import (
 
 // MQTT route
 var mqttRoutes = map[string]Route{
-	// Guest (無需 JWT)
+
+	"home_hello": {Handler: executeMqtt(test.SayHello), Permission: PermGuest},
+	
+	// account
 	"account_login":    {Handler: executeMqtt(account.Login), Permission: PermGuest},
 	"account_register": {Handler: executeMqtt(account.Register), Permission: PermGuest},
-	"say_hello":        {Handler: executeMqtt(test.SayHello), Permission: PermGuest},
-	"system_status":    {Handler: nil, Permission: PermGuest},
 
-	// Admin
-	"device_create": {Handler: executeMqtt(device.Create), Permission: PermAdmin},
-	"device_online": {Handler: nil, Permission: PermAdmin},
-	"device_all":    {Handler: executeMqtt(device.DeviceList), Permission: PermAdmin},
+	// device
+	"device_create":    {Handler: executeMqtt(device.Create), Permission: PermAdmin},
+	"device_recording": {Handler: nil, Permission: PermMember},
+	"device_online":    {Handler: executeMqtt(device.OnlineDeviceList), Permission: PermAdmin},
+	"device_status":    {Handler: nil, Permission: PermMember},
+	"device_all":       {Handler: executeMqtt(device.DeviceList), Permission: PermAdmin},
+
+	// trip
+	"trips": {Handler: executeMqtt(trip.DeviceTrips), Permission: PermMember}, /*待改成trip_list*/
+	"trip":  {Handler: executeMqtt(trip.TripDetail), Permission: PermMember},  /*待改成trip_detail*/
 
 	// Member
-	"device_recording": {Handler: nil, Permission: PermMember},
 	"member_addDevice": {Handler: executeMqtt(member.AddDevice), Permission: PermMember},
-	"device_status":    {Handler: nil, Permission: PermMember},
 	"member_devices":   {Handler: executeMqtt(member.MemberDeviceList), Permission: PermMember},
-	"trip_list":        {Handler: executeMqtt(trip.DeviceTrips), Permission: PermMember},
-	"trip":             {Handler: executeMqtt(trip.TripDetail), Permission: PermMember},
+
+	// system
+	"system_status": {Handler: nil, Permission: PermGuest},
 }
 
-type MqttHandler func(cleint mqtt.Client, payload, jwt, clientId, ip string, requestTime time.Time)
+type MqttHandler func(mqtt.Client, string, string, string, string, time.Time)
 
 type Permission int
 
@@ -60,7 +66,12 @@ type Route struct {
 // topic sample : req/action/clientId/jwt/ip
 func RouteFunction(client mqtt.Client, action, payload, clientId, jwt, ip string, requestTime time.Time) {
 	// 查找路由
-	routeInfo := mqttRoutes[action]
+	routeInfo, exist := mqttRoutes[action]
+	if !exist || routeInfo.Handler == nil {
+		logafa.Warn("查無此路徑", "action", action)
+		sendBackErrMsg(client, clientId, "此功能暫未開放")
+		return
+	}
 	// 權限檢查
 	if _, err := middleware.ValidateJWT(jwt, middleware.Permission(routeInfo.Permission)); err != nil {
 		logafa.Warn("JWT 驗證失敗", "error", err, "action", action, "user", clientId)
@@ -76,11 +87,11 @@ func OnMessageReceived(client mqtt.Client, msg mqtt.Message) {
 	payload := string(msg.Payload())
 	topic := msg.Topic()
 
-	logafa.Debug("收到 MQTT 訊息！Topic: %s | Payload: %s", topic, payload)
+	logafa.Debug("收到 MQTT 訊息", "topic", topic, "payload", payload)
 
 	action, clientId, jwt, ip := extractInfoFromTopic(topic)
 	if action == "" || ip == "" {
-		logafa.Warn("無法解析 action 或 ip: %s", topic)
+		logafa.Warn("無法解析 action 或 ip", "topic", topic)
 		sendBackErrMsg(client, clientId, "無法解析 action 或 ip: %s", topic)
 		return
 	}
@@ -91,7 +102,7 @@ func OnMessageReceived(client mqtt.Client, msg mqtt.Message) {
 		defer func() {
 			global.NormalWorkerPool <- struct{}{}
 			if r := recover(); r != nil {
-				logafa.Error("MQTT handler panic: %v\n on %s", r, topic)
+				logafa.Error("MQTT handler panic:", "error", r, "topic", topic)
 			}
 		}()
 		RouteFunction(client, action, payload, clientId, jwt, ip, requestTime)
@@ -113,6 +124,14 @@ func sendBackErrMsg(client mqtt.Client, clientId, reason string, args ...interfa
 func executeMqtt(handler func(request.RequestContext)) MqttHandler {
 	return func(client mqtt.Client, payload, jwt, clientID, ip string, requestTime time.Time) {
 		ctx := adapter.NewMQTTContext(client, payload, jwt, clientID, ip, requestTime)
+		defer ctx.Cancel()
+		// 加上 panic 保護
+		defer func() {
+			if r := recover(); r != nil {
+				logafa.Error("MQTT handler panic", "error", r)
+				ctx.Error(500, "內部錯誤")
+			}
+		}()
 		handler(ctx)
 	}
 }

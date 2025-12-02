@@ -31,7 +31,7 @@ func RegisterRoutes(r *gin.Engine) {
 	// 依類別分組
 	homeGroup := r.Group("/home")
 	{
-		homeGroup.GET("/say_hello", executeHttp(test.SayHello))
+		homeGroup.GET("/hello", executeHttp(test.SayHello))
 	}
 
 	accountGroup := r.Group("/account")
@@ -52,7 +52,7 @@ func RegisterRoutes(r *gin.Engine) {
 	tripGroup := r.Group("/trip")
 	{
 		tripGroup.GET("/tripList", identityRequired(MEMBER), executeHttp(trip.DeviceTrips))
-		tripGroup.GET("/trip", identityRequired(MEMBER), executeHttp(trip.TripDetail))
+		tripGroup.GET("/detail", identityRequired(MEMBER), executeHttp(trip.TripDetail))
 	}
 
 	memberGroup := r.Group("/member")

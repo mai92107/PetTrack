@@ -22,8 +22,10 @@ func NewHttpContext(c *gin.Context) request.RequestContext {
 }
 
 // Create new context
-func (h *HTTPContext) GetContext() context.Context {
+func (h *HTTPContext) GetContext() (context.Context) {
 	return h.ctx.Request.Context()
+}
+func (h *HTTPContext) Cancel() {
 }
 
 // BindJSON implements request.RequestContext.

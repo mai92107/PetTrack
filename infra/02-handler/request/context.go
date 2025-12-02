@@ -9,6 +9,7 @@ type RequestContext interface {
 
 	// 提供context
 	GetContext() context.Context
+	Cancel()
 
 	// 取得用戶ID
 	GetClientID() string

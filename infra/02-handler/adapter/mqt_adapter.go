@@ -18,9 +18,13 @@ type MQTTContext struct {
 	clientID    string
 	ip          string
 	requestTime time.Time
+
+	ctx    context.Context
+	cancel context.CancelFunc
 }
 
 func NewMQTTContext(client mqtt.Client, payload, jwt, clientID, ip string, requestTime time.Time) request.RequestContext {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	return &MQTTContext{
 		client:      client,
 		payload:     payload,
@@ -28,14 +32,20 @@ func NewMQTTContext(client mqtt.Client, payload, jwt, clientID, ip string, reque
 		clientID:    clientID,
 		ip:          ip,
 		requestTime: requestTime,
+
+		ctx:    ctx,
+		cancel: cancel,
 	}
 }
 
 // Create new context
 func (m *MQTTContext) GetContext() context.Context {
-	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
-	defer cancel()
-	return ctx
+	return m.ctx
+}
+func (m *MQTTContext) Cancel() {
+	if m.cancel != nil {
+		m.cancel()
+	}
 }
 
 // BindJSON implements request.RequestContext.
