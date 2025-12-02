@@ -1,7 +1,7 @@
 package test
 
 import (
-	"PetTrack/core/util/logafa"
+	"PetTrack/infra/00-core/util/logafa"
 	"PetTrack/infra/02-handler/request"
 	"time"
 )

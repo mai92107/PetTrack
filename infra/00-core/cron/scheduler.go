@@ -1,9 +1,10 @@
 package cron
 
 import (
-	"PetTrack/core/util/logafa"
 	domainService "PetTrack/domain/service"
+	"PetTrack/infra/00-core/util/logafa"
 	"context"
+	"time"
 
 	"github.com/robfig/cron/v3"
 )
@@ -40,11 +41,11 @@ func (s *Scheduler) CronStart() {
 
 	// 每10分鐘執行一次
 	executeJob(c, Ten, []func(ctx context.Context){
-		func(ctx context.Context) { s.tripService.FlushTripFmMongoToMaria(ctx, 30) },
+		func(ctx context.Context) { s.tripService.FlushTripFmMongoToMaria(ctx, 30*time.Minute) },
 	})
 
 	// 每15分鐘執行一次
-	executeJob(c, Quarter, []func(context.Context){}) 
+	executeJob(c, Quarter, []func(context.Context){})
 
 	// 每半小時執行一次
 	executeJob(c, HalfHour, []func(context.Context){})
@@ -59,7 +60,7 @@ func (s *Scheduler) CronStart() {
 
 	// 每天執行一次（每日00:00）
 	executeJob(c, Day, []func(context.Context){
-		logafa.StartRotateFile,
+		func(_ context.Context) { logafa.StartRotateFile() },
 	})
 
 	c.Start()

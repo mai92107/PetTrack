@@ -1,8 +1,9 @@
 package domainService
 
 import (
-	"PetTrack/core/model"
+	"PetTrack/infra/00-core/model"
 	"context"
+	"time"
 )
 
 type AccountService interface {
@@ -20,7 +21,7 @@ type TripService interface {
 	GetDeviceTrips(ctx context.Context, member model.Claims, deviceId string, pageable model.Pageable) ([]map[string]interface{}, int64, int64, error)
 	GetTripDetail(ctx context.Context, member model.Claims, deviceId string, tripUuid string) (map[string]interface{}, error)
 	SaveGpsFmRdsToMongo(ctx context.Context)
-	FlushTripFmMongoToMaria(ctx context.Context, timeDuration int)
+	FlushTripFmMongoToMaria(ctx context.Context, d time.Duration)
 }
 
 type MemberService interface {

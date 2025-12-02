@@ -1,8 +1,8 @@
 package initial
 
 import (
-	bun "PetTrack/core/model/bunMachines"
 	domainRepo "PetTrack/domain/repo"
+	bun "PetTrack/infra/00-core/model/bunMachines"
 	repo "PetTrack/infra/04-repository"
 	cache "PetTrack/infra/04-repository/redisUtilImpl"
 

@@ -1,7 +1,7 @@
 package jwtUtil
 
 import (
-	"PetTrack/core/model"
+	"PetTrack/infra/00-core/model"
 	"fmt"
 	"strings"
 	"time"

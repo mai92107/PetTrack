@@ -1,7 +1,7 @@
 package account
 
 import (
-	"PetTrack/core/global"
+	"PetTrack/infra/00-core/global"
 	"context"
 	"fmt"
 )

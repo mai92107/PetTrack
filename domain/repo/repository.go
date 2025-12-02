@@ -1,8 +1,9 @@
 package domainRepo
 
 import (
-	"PetTrack/core/model"
+	"PetTrack/infra/00-core/model"
 	"context"
+	"time"
 
 	"github.com/google/uuid"
 	"gorm.io/gorm"
@@ -32,7 +33,7 @@ type TripRepository interface {
 	GetDeviceTrips(ctx context.Context, deviceId string, pageable model.Pageable) ([]TripSummary, int64, int64, error)
 	GetTripDetail(ctx context.Context, tripUuid string) (TripSummary, error)
 	SaveLocationToDB(ctx context.Context, records []DeviceLocation) error
-	ReadTripFromMongo(ctx context.Context, timeDuration int) ([]TripSummary, error)
+	ReadTripFromMongo(ctx context.Context, d time.Duration) ([]TripSummary, error)
 	SaveTripToDB(ctx context.Context, results []TripSummary) error
 }
 

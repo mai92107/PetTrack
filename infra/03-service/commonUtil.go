@@ -1,7 +1,7 @@
 package service
 
 import (
-	"PetTrack/core/model"
+	"PetTrack/infra/00-core/model"
 	domainRepo "PetTrack/domain/repo"
 	domainService "PetTrack/domain/service"
 	"context"

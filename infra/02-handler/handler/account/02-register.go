@@ -1,7 +1,7 @@
 package account
 
 import (
-	"PetTrack/core/global"
+	"PetTrack/infra/00-core/global"
 	handler "PetTrack/infra/02-handler/handler"
 	"PetTrack/infra/02-handler/request"
 	"net/http"

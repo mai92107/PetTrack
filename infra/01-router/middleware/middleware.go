@@ -1,7 +1,7 @@
 package middleware
 
 import (
-	"PetTrack/core/util/logafa"
+	"PetTrack/infra/00-core/util/logafa"
 	"context"
 	"net/http"
 	"time"

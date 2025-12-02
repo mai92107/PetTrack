@@ -1,7 +1,6 @@
 package logafa
 
 import (
-	"context"
 	"os"
 	"path/filepath"
 	"sync"
@@ -16,7 +15,7 @@ var (
 func CreateLogFileNow() {
 	openLogFile()
 }
-func StartRotateFile(ctx context.Context) {
+func StartRotateFile() {
 	openLogFile()
 }
 

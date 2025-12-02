@@ -1,9 +1,9 @@
 package initial
 
 import (
-	bun "PetTrack/core/model/bunMachines"
-	"PetTrack/core/util/logafa"
 	initMethod "PetTrack/domain/init"
+	bun "PetTrack/infra/00-core/model/bunMachines"
+	"PetTrack/infra/00-core/util/logafa"
 	"log/slog"
 
 	"github.com/redis/go-redis/v9"

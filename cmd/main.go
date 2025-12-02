@@ -1,8 +1,8 @@
 package main
 
 import (
-	"PetTrack/core/cron"
-	"PetTrack/core/util/logafa"
+	"PetTrack/infra/00-core/cron"
+	"PetTrack/infra/00-core/util/logafa"
 	router "PetTrack/infra/01-router"
 	"context"
 	"fmt"

@@ -1,6 +1,6 @@
 package initial
 
-import "PetTrack/core/cron"
+import "PetTrack/infra/00-core/cron"
 
 func InitCron(s *Services) {
 	cron.NewScheduler(

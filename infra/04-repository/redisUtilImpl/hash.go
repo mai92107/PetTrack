@@ -1,7 +1,7 @@
 package cache
 
 import (
-	"PetTrack/core/util/logafa"
+	"PetTrack/infra/00-core/util/logafa"
 	"context"
 )
 

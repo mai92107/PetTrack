@@ -1,8 +1,8 @@
 package router
 
 import (
-	"PetTrack/core/global"
-	"PetTrack/core/util/logafa"
+	"PetTrack/infra/00-core/global"
+	"PetTrack/infra/00-core/util/logafa"
 	"PetTrack/infra/01-router/middleware"
 	"PetTrack/infra/02-handler/adapter"
 	"PetTrack/infra/02-handler/handler/account"

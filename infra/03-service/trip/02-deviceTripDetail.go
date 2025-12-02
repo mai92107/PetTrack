@@ -1,8 +1,8 @@
 package trip
 
 import (
-	"PetTrack/core/model"
-	"PetTrack/core/util/formatter"
+	"PetTrack/infra/00-core/model"
+	"PetTrack/infra/00-core/util/formatter"
 	"context"
 	"fmt"
 )

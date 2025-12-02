@@ -1,8 +1,8 @@
 package repo
 
 import (
-	"PetTrack/core/global"
-	"PetTrack/core/model"
+	"PetTrack/infra/00-core/global"
+	"PetTrack/infra/00-core/model"
 	domain "PetTrack/domain/repo"
 	"context"
 	"fmt"

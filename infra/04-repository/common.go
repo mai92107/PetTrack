@@ -1,7 +1,7 @@
 package repo
 
 import (
-	bun "PetTrack/core/model/bunMachines"
+	bun "PetTrack/infra/00-core/model/bunMachines"
 	domainRepo "PetTrack/domain/repo"
 
 	"go.mongodb.org/mongo-driver/mongo"

@@ -1,9 +1,9 @@
 package repo
 
 import (
-	"PetTrack/core/model"
-	"PetTrack/core/util/logafa"
-	"PetTrack/core/util/parser"
+	"PetTrack/infra/00-core/model"
+	"PetTrack/infra/00-core/util/logafa"
+	"PetTrack/infra/00-core/util/parser"
 	domainRepo "PetTrack/domain/repo"
 	"context"
 	"fmt"
@@ -109,10 +109,10 @@ func (r *tripRepoImpl) SaveLocationToDB(ctx context.Context, records []domainRep
 	return nil
 }
 
-func (r *tripRepoImpl) ReadTripFromMongo(ctx context.Context, timeDuration int) ([]domainRepo.TripSummary, error) {
+func (r *tripRepoImpl) ReadTripFromMongo(ctx context.Context, d time.Duration) ([]domainRepo.TripSummary, error) {
 	coll := r.mongo.Collection("pettrack")
 
-	duration := time.Now().UTC().Add(time.Minute * -(time.Duration(timeDuration)))
+	duration := time.Now().UTC().Add(-1 * (d))
 	pipeline := mongo.Pipeline{
 		{{Key: "$match", Value: bson.D{
 			{Key: "recorded_at", Value: bson.D{{Key: "$gte", Value: duration}}},

@@ -1,8 +1,8 @@
 package initial
 
 import (
-	bun "PetTrack/core/model/bunMachines"
 	domainService "PetTrack/domain/service"
+	bun "PetTrack/infra/00-core/model/bunMachines"
 	service "PetTrack/infra/03-service"
 	"PetTrack/infra/03-service/account"
 	"PetTrack/infra/03-service/device"

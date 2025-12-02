@@ -1,9 +1,9 @@
 package trip
 
 import (
-	"PetTrack/core/global"
-	"PetTrack/core/model"
-	jwtUtil "PetTrack/core/util/jwt"
+	"PetTrack/infra/00-core/global"
+	"PetTrack/infra/00-core/model"
+	jwtUtil "PetTrack/infra/00-core/util/jwt"
 	handler "PetTrack/infra/02-handler/handler"
 	"PetTrack/infra/02-handler/request"
 	"PetTrack/infra/02-handler/response"

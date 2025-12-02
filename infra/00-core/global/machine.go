@@ -1,7 +1,7 @@
 package global
 
 import (
-	"PetTrack/core/model"
+	"PetTrack/infra/00-core/model"
 	"sync"
 	"sync/atomic"
 

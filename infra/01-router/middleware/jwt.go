@@ -2,9 +2,9 @@
 package middleware
 
 import (
-	"PetTrack/core/model"
-	jwtUtil "PetTrack/core/util/jwt"
-	"PetTrack/core/util/logafa"
+	"PetTrack/infra/00-core/util/logafa"
+	"PetTrack/infra/00-core/model"
+	jwtUtil "PetTrack/infra/00-core/util/jwt"
 	"errors"
 	"net/http"
 	"strings"
