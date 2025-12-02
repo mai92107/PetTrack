@@ -1,0 +1,26 @@
+package parser
+
+import (
+	"PetTrack/core/global"
+	"time"
+)
+
+func ToUtcTime(time time.Time) time.Time {
+	return time.UTC()
+}
+
+func ToLocalTime(time time.Time) time.Time {
+	return time.Local()
+}
+
+func ToUtcTimeStr(time time.Time) string {
+	return time.UTC().Format(global.TIME_FORMAT)
+}
+
+func ToLocalTimeStr(time time.Time) string {
+	return time.Local().Format(global.TIME_FORMAT)
+}
+
+func ToLocalTimeShortStr(time time.Time) string {
+	return time.Local().Format("01/02 15:04:05")
+}

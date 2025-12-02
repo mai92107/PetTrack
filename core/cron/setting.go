@@ -1,7 +1,6 @@
 package cron
 
 import (
-	"PetTrack/core/global"
 	"PetTrack/core/util/logafa"
 	"sync"
 	"time"
@@ -43,7 +42,6 @@ var cronSpecs = map[CronType]cronInfo{
 	Day:      {spec: "35 0 0 * * *", infoName: "每天"},
 }
 
-
 func executeJob(c *cron.Cron, cronType CronType, jobs []func()) {
 	// 沒工作就離開
 	if len(jobs) == 0 {
@@ -52,7 +50,7 @@ func executeJob(c *cron.Cron, cronType CronType, jobs []func()) {
 
 	c.AddFunc(cronSpecs[cronType].spec, func() {
 		start := time.Now()
-		logafa.Debug("%s執行程序, 現在時間: %+v", cronSpecs[cronType].infoName, start.Format(TIME_LAYOUT))
+		logafa.Debug("", "執行程序", cronSpecs[cronType].infoName, "現在時間", start.Format(TIME_LAYOUT))
 
 		var localWg sync.WaitGroup
 		for _, job := range jobs {
@@ -60,24 +58,24 @@ func executeJob(c *cron.Cron, cronType CronType, jobs []func()) {
 		}
 		localWg.Wait()
 		duration := time.Since(start)
-		logafa.Debug("%s任務執行完畢，耗時: %v", cronSpecs[cronType].infoName, duration)
+		logafa.Debug("", "任務執行完畢", cronSpecs[cronType].infoName, "耗時", duration)
 	})
 }
 
 // 工人分配執行工作
 func submitJobAsync(job func(), localWg *sync.WaitGroup) {
-	wg.Add(1)
-	<-global.NormalWorkerPool // 取得 worker
-	localWg.Add(1)
+	// wg.Add(1)
+	// <-global.NormalWorkerPool // 取得 worker
+	// localWg.Add(1)
 	go func() {
-		defer func() {
-			wg.Done()
-			localWg.Done()
-			global.NormalWorkerPool <- struct{}{}
-		}()
+		// defer func() {
+		// 	wg.Done()
+		// 	localWg.Done()
+		// 	global.NormalWorkerPool <- struct{}{}
+		// }()
 		start := time.Now().UTC()
 		job()
-		logafa.Debug("單一任務完成，耗時: %v", time.Since(start))
+		logafa.Debug("單一任務完成", "耗時", time.Since(start))
 	}()
 }
 

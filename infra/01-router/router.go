@@ -3,10 +3,11 @@ package router
 import (
 	"PetTrack/infra/01-router/middleware"
 	"PetTrack/infra/02-handler/adapter"
-	"PetTrack/infra/02-handler/http/account"
-	"PetTrack/infra/02-handler/http/device"
-	"PetTrack/infra/02-handler/http/member"
-	"PetTrack/infra/02-handler/http/test"
+	"PetTrack/infra/02-handler/handler/account"
+	"PetTrack/infra/02-handler/handler/device"
+	"PetTrack/infra/02-handler/handler/member"
+	"PetTrack/infra/02-handler/handler/test"
+	"PetTrack/infra/02-handler/handler/trip"
 	"PetTrack/infra/02-handler/request"
 	"time"
 
@@ -45,8 +46,8 @@ func RegisterRoutes(r *gin.Engine) {
 
 	tripGroup := r.Group("/trip")
 	{
-		tripGroup.GET("/tripList", identityRequired(MEMBER), executeHttp(device.DeviceTrips))
-		tripGroup.GET("/trip", identityRequired(MEMBER), executeHttp(device.TripDetail))
+		tripGroup.GET("/tripList", identityRequired(MEMBER), executeHttp(trip.DeviceTrips))
+		tripGroup.GET("/trip", identityRequired(MEMBER), executeHttp(trip.TripDetail))
 	}
 
 	memberGroup := r.Group("/member")

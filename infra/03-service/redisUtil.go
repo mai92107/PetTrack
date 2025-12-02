@@ -2,6 +2,7 @@ package service
 
 import (
 	"PetTrack/core/global"
+	"PetTrack/core/util/logafa"
 	domainRepo "PetTrack/domain/repo"
 	domainService "PetTrack/domain/service"
 	"context"
@@ -24,7 +25,11 @@ func NewRedisRepository(
 }
 
 func (s *redisServiceImpl) InitDeviceSequence(ctx context.Context) {
-	device_setting := s.redisUtil.HGetAllData(ctx, "device_setting")
+	device_setting, err := s.redisUtil.HGetAllData(ctx, "device_setting")
+	if err != nil {
+		logafa.Error("裝置序號初始化失敗")
+		return
+	}
 
 	prefix := "AA"
 	seq := 0
@@ -36,17 +41,17 @@ func (s *redisServiceImpl) InitDeviceSequence(ctx context.Context) {
 				"device_sequence": seq,
 			})
 	}
-	// logafa.Debug(" ✅ 成功初始化裝置設定")
+	logafa.Debug(" ✅ 成功初始化裝置設定")
 }
 
-func (s *redisServiceImpl) GenerateDeviceId(ctx context.Context) string {
-	prefix := s.redisUtil.HGetData(ctx, "device_setting", "device_prefix")
+func (s *redisServiceImpl) GenerateDeviceId(ctx context.Context) (string, error) {
+	prefix, err := s.redisUtil.HGetData(ctx, "device_setting", "device_prefix")
 	sequence, err := s.redis.HIncrBy(ctx, "device_setting", "device_sequence", 1).Result()
 	if err != nil {
-		// logafa.Error("failed to increment sequence in Redis: %v", err)
-		return ""
+		logafa.Error("裝置編號產生失敗", "error", err)
+		return "", err
 	}
-	return fmt.Sprintf("%s-%06d", prefix, sequence)
+	return fmt.Sprintf("%s-%06d", prefix, sequence), nil
 }
 
 func (s *redisServiceImpl) GetOnlineDeviceList(ctx context.Context) ([]string, error) {
@@ -65,6 +70,6 @@ func (s *redisServiceImpl) GetOnlineDeviceList(ctx context.Context) ([]string, e
 			deviceIds = append(deviceIds, parts[1])
 		}
 	}
-	// logafa.Info("目前在線裝置數量: %d", len(deviceIds))
+	logafa.Info("目前在線裝置數量", "數量", len(deviceIds))
 	return deviceIds, nil
 }

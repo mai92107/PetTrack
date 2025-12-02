@@ -5,7 +5,6 @@ import (
 	"PetTrack/core/util/logafa"
 	initMethod "PetTrack/domain/init"
 	"log/slog"
-	"os"
 
 	"github.com/redis/go-redis/v9"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -16,21 +15,25 @@ func Init() {
 	InitLogger()
 
 	db := InitDB()
-	_ = InitMongo()
+	mongo := InitMongo()
 	redis := InitRedis()
-	repos := InitRepositories(db, redis)
+	repos := InitRepositories(db, redis, mongo)
 	services := InitServices(repos, db, redis)
 	InitHandlers(services)
+
+	InitCron(services)
 }
 
-func InitLogger() *slog.Logger {
-	// log.CreateLogFileNow()
+func InitLogger() {
+	logafa.CreateLogFileNow()
 
-	level := slog.LevelDebug
-	logHandler := logafa.NewColorHandler(level, os.Stdout)
-	logger := slog.New(logHandler)
-	slog.SetDefault(logger)
-	return logger
+	// 初始化（全專案只需要呼叫一次）
+	handler := logafa.NewLogafaHandler(&slog.HandlerOptions{
+		Level:     slog.LevelDebug,
+		AddSource: true, // 關鍵！讓 slog 自動填正確的 caller
+	})
+
+	slog.SetDefault(slog.New(handler))
 }
 
 func InitDB() *bun.DB {

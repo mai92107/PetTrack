@@ -11,11 +11,16 @@ type AccountService interface {
 }
 
 type DeviceService interface {
-	Create(ctx context.Context, deviceType string, memberId int64) (string, error)
-	OnlineDeviceList(ctx context.Context) ([]string, error)
-	DeviceList(ctx context.Context) ([]string, error)
-	GetDeviceTrips(ctx context.Context, member model.Claims, deviceId string, pageable model.Pageable) ([]map[string]interface{}, int64, int64, error)
-	GetTripDetail(ctx context.Context, member model.Claims, deviceId string, tripUuid string) (map[string]interface{}, error)
+	Create(deviceType string, memberId int64) (string, error)
+	OnlineDeviceList() ([]string, error)
+	DeviceList() ([]string, error)
+}
+
+type TripService interface {
+	GetDeviceTrips(member model.Claims, deviceId string, pageable model.Pageable) ([]map[string]interface{}, int64, int64, error)
+	GetTripDetail(member model.Claims, deviceId string, tripUuid string) (map[string]interface{}, error)
+	SaveGpsFmRdsToMongo()
+	FlushTripFmMongoToMaria(timeDuration int)
 }
 
 type MemberService interface {
@@ -29,6 +34,6 @@ type CommonService interface {
 
 type RedisService interface {
 	InitDeviceSequence(ctx context.Context)
-	GenerateDeviceId(ctx context.Context) string
+	GenerateDeviceId(ctx context.Context) (string, error)
 	GetOnlineDeviceList(ctx context.Context) ([]string, error)
 }

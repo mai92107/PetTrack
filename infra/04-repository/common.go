@@ -5,6 +5,7 @@ import (
 	domain "PetTrack/domain/repo"
 	domainRepo "PetTrack/domain/repo"
 
+	"go.mongodb.org/mongo-driver/mongo"
 	"gorm.io/gorm"
 )
 
@@ -55,12 +56,14 @@ func NewDeviceRepository(
 type tripRepoImpl struct {
 	write *gorm.DB
 	read  *gorm.DB
+	mongo *mongo.Database
 }
 
 func NewTripRepository(
 	db *bun.DB,
+	mongo *mongo.Database,
 ) domainRepo.TripRepository {
-	return &tripRepoImpl{write: db.Write, read: db.Read}
+	return &tripRepoImpl{write: db.Write, read: db.Read, mongo: mongo}
 }
 
 type memberDeviceRepoImpl struct {
