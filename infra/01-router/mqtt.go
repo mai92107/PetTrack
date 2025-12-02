@@ -42,7 +42,7 @@ var mqttRoutes = map[string]Route{
 	"trip":             {Handler: executeMqtt(trip.TripDetail), Permission: PermMember},
 }
 
-type MqttHandler func(cleint *mqtt.Client, payload, jwt, clientId, ip string, requestTime time.Time)
+type MqttHandler func(cleint mqtt.Client, payload, jwt, clientId, ip string, requestTime time.Time)
 
 type Permission int
 
@@ -58,7 +58,7 @@ type Route struct {
 }
 
 // topic sample : req/action/clientId/jwt/ip
-func RouteFunction(client *mqtt.Client, action, payload, clientId, jwt, ip string, requestTime time.Time) {
+func RouteFunction(client mqtt.Client, action, payload, clientId, jwt, ip string, requestTime time.Time) {
 	// 查找路由
 	routeInfo := mqttRoutes[action]
 	// 權限檢查
@@ -71,7 +71,7 @@ func RouteFunction(client *mqtt.Client, action, payload, clientId, jwt, ip strin
 	routeInfo.Handler(client, payload, jwt, clientId, ip, requestTime)
 }
 
-func OnMessageReceived(client *mqtt.Client, msg mqtt.Message) {
+func OnMessageReceived(client mqtt.Client, msg mqtt.Message) {
 	requestTime := global.GetNow()
 	payload := string(msg.Payload())
 	topic := msg.Topic()
@@ -103,7 +103,7 @@ func extractInfoFromTopic(topic string) (action, clientId, jwt, ip string) {
 	return parts[1], parts[2], parts[3], parts[4]
 }
 
-func sendBackErrMsg(client *mqtt.Client, clientId, reason string, args ...interface{}) {
+func sendBackErrMsg(client mqtt.Client, clientId, reason string, args ...interface{}) {
 	requestTime := time.Now().UTC()
 	errTopic := "errReq/" + clientId
 	fullReason := fmt.Sprintf(reason, args...)
@@ -111,7 +111,7 @@ func sendBackErrMsg(client *mqtt.Client, clientId, reason string, args ...interf
 }
 
 func executeMqtt(handler func(request.RequestContext)) MqttHandler {
-	return func(client *mqtt.Client, payload, jwt, clientID, ip string, requestTime time.Time) {
+	return func(client mqtt.Client, payload, jwt, clientID, ip string, requestTime time.Time) {
 		ctx := adapter.NewMQTTContext(client, payload, jwt, clientID, ip, requestTime)
 		handler(ctx)
 	}

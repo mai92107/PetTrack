@@ -12,7 +12,7 @@ import (
 )
 
 type MQTTContext struct {
-	client      *mqtt.Client
+	client      mqtt.Client
 	payload     string
 	jwt         string
 	clientID    string
@@ -20,7 +20,7 @@ type MQTTContext struct {
 	requestTime time.Time
 }
 
-func NewMQTTContext(client *mqtt.Client, payload, jwt, clientID, ip string, requestTime time.Time) request.RequestContext {
+func NewMQTTContext(client mqtt.Client, payload, jwt, clientID, ip string, requestTime time.Time) request.RequestContext {
 	return &MQTTContext{
 		client:      client,
 		payload:     payload,

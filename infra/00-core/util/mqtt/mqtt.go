@@ -1,6 +1,7 @@
 package mqttUtil
 
 import (
+	"PetTrack/infra/00-core/util/logafa"
 	"fmt"
 	"time"
 
@@ -18,22 +19,22 @@ func SubTopic(client mqtt.Client, topic string, handler mqtt.MessageHandler) err
 	return nil
 }
 
-func PubMsgToTopic(client *mqtt.Client, topic, msg string) error {
+func PubMsgToTopic(client mqtt.Client, topic, msg string) error {
 	if topic == "" {
 		return fmt.Errorf("發布主題不可為空")
 	}
 	if msg == "" {
 		return fmt.Errorf("發布內容不可為空")
 	}
-	token := (*client).Publish(topic, 1, false, msg)
+	token := client.Publish(topic, 1, false, msg)
 	success := token.WaitTimeout(3 * time.Second)
 	if !success {
 		return fmt.Errorf("發送訊息逾時")
 	}
 	if token.Error() != nil {
-		// logafa.Error("❌ 發送訊息失敗: %v", token.Error())
+		logafa.Error("❌ 發送訊息失敗", "error", token.Error())
 		return token.Error()
 	}
-	// logafa.Debug("✅ topic: %s 已發送訊息: %s", topic, msg)
+	logafa.Debug("✅ 發送訊息", "topic", topic, "msg", msg)
 	return nil
 }

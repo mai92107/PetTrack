@@ -5,8 +5,10 @@ import (
 	"PetTrack/infra/00-core/global"
 	bun "PetTrack/infra/00-core/model/bunMachines"
 	"PetTrack/infra/00-core/util/logafa"
+	router "PetTrack/infra/01-router"
 	"log/slog"
 
+	mqtt "github.com/eclipse/paho.mqtt.golang"
 	"github.com/redis/go-redis/v9"
 	"go.mongodb.org/mongo-driver/mongo"
 )
@@ -23,6 +25,7 @@ func Init() {
 
 	InitHandlers(services)
 	InitCron(services)
+	InitMosquitto()
 }
 
 func InitWorkers() {
@@ -85,4 +88,8 @@ func InitRedis() *redis.Client {
 	}
 	logafa.Debug("REDIS 初始化完成")
 	return redis
+}
+
+func InitMosquitto() mqtt.Client {
+	return initMethod.InitMosquitto("mqttgo.io", "1883", "", "", router.OnMessageReceived, []string{"req/+/+/+/+"})
 }
