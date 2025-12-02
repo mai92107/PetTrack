@@ -38,9 +38,16 @@ func openLogFile() {
 
 func getCurrentLogFile(getFilename func() string) *os.File {
 	filename := getFilename()
+
+	dir := filepath.Dir(filename)
+	if err := os.MkdirAll(dir, 0755); err != nil {
+		Error("[LOGAFA] 建立 log 目錄失敗", "error", err)
+		return nil
+	}
+
 	file, err := os.OpenFile(filename, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0644)
 	if err != nil {
-		Error("[LOGAFA] 檔案開啟失敗")
+		Error("[LOGAFA] 檔案開啟失敗", "error", err)
 		return nil
 	}
 	return file
