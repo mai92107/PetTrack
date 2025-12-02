@@ -1,8 +1,8 @@
 package main
 
 import (
+	"PetTrack/core/cron"
 	"PetTrack/core/util/logafa"
-	initial "PetTrack/infra/00-init"
 	router "PetTrack/infra/01-router"
 	"context"
 	"fmt"
@@ -16,7 +16,7 @@ import (
 )
 
 func main() {
-	initial.Init()
+	// initial.Init()
 
 	srv := initServer()
 	gracefulShutdown(srv)
@@ -46,7 +46,7 @@ func gracefulShutdown(srv *http.Server) {
 	<-quit // 等待訊號
 	logafa.Info("收到終止訊號，開始優雅關閉...")
 
-	// cron.CheckIsCronJobsFinished()
+	cron.CheckIsCronJobsFinished()
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()

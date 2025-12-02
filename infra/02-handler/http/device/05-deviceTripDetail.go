@@ -27,7 +27,7 @@ func TripDetail(ctx request.RequestContext) {
 		ctx.Error(http.StatusForbidden, "身份認證錯誤")
 		return
 	}
-	info, err := handler.DeviceService.GetTripDetail(*userInfo, req.DeviceId, req.TripUuid)
+	info, err := handler.DeviceService.GetTripDetail(ctx.GetContext(), *userInfo, req.DeviceId, req.TripUuid)
 	if err != nil {
 		// logafa.Error("系統發生錯誤, error: %+v", err)
 		ctx.Error(http.StatusInternalServerError, global.COMMON_SYSTEM_ERROR)

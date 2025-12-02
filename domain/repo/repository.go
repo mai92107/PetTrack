@@ -2,37 +2,38 @@ package domainRepo
 
 import (
 	"PetTrack/core/model"
+	"context"
 
 	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
 
 type AccountRepository interface {
-	FindByAccountName(accountName string) (*Account, error)
-	UpdateLoginTime(uuid uuid.UUID) error
-	Create(tx *gorm.DB, memberId int64, username, password, email string) (uuid.UUID, error)
+	FindByAccountName(ctx context.Context, accountName string) (*Account, error)
+	UpdateLoginTime(ctx context.Context, uuid uuid.UUID) error
+	Create(tx *gorm.DB, ctx context.Context, memberId int64, username, password, email string) (uuid.UUID, error)
 }
 
 type MemberRepository interface {
-	CreateMember(tx *gorm.DB, lastname, firstname, nickname, email string) (int64, error)
+	CreateMember(tx *gorm.DB, ctx context.Context, lastname, firstname, nickname, email string) (int64, error)
 }
 
 type PasswordRepository interface {
-	CreateHistory(tx *gorm.DB, accountUuid uuid.UUID, password string) error
+	CreateHistory(tx *gorm.DB, ctx context.Context, accountUuid uuid.UUID, password string) error
 }
 
 type DeviceRepository interface {
-	Create(deviceType string, memberId int64, deviceId string) error
-	GetDeviceList() ([]string, error)
-	FindDeviceById(deviceId string) (Device, error)
+	Create(ctx context.Context, deviceType string, memberId int64, deviceId string) error
+	GetDeviceList(ctx context.Context) ([]string, error)
+	FindDeviceById(ctx context.Context, deviceId string) (Device, error)
 }
 
 type TripRepository interface {
-	GetDeviceTrips(deviceId string, pageable model.Pageable) ([]TripSummary, int64, int64, error)
-	GetTripDetail(tripUuid string) (TripSummary, error)
+	GetDeviceTrips(ctx context.Context, deviceId string, pageable model.Pageable) ([]TripSummary, int64, int64, error)
+	GetTripDetail(ctx context.Context, tripUuid string) (TripSummary, error)
 }
 
 type MemberDeviceRepository interface {
-	AddDevice(memberId int64, deviceId, deviceName string) error
-	GetMemberDeviceList(memberId int64) ([]string, error)
+	AddDevice(ctx context.Context, memberId int64, deviceId, deviceName string) error
+	GetMemberDeviceList(ctx context.Context, memberId int64) ([]string, error)
 }

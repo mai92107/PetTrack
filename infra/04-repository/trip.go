@@ -3,11 +3,12 @@ package repo
 import (
 	"PetTrack/core/model"
 	domainRepo "PetTrack/domain/repo"
+	"context"
 	"fmt"
 	"math"
 )
 
-func (r *tripRepoImpl) GetDeviceTrips(deviceId string, pageable model.Pageable) ([]domainRepo.TripSummary, int64, int64, error) {
+func (r *tripRepoImpl) GetDeviceTrips(ctx context.Context, deviceId string, pageable model.Pageable) ([]domainRepo.TripSummary, int64, int64, error) {
 	var deviceTrips []domainRepo.TripSummary
 	var totalCount int64
 	var totalPage int64
@@ -29,7 +30,8 @@ func (r *tripRepoImpl) GetDeviceTrips(deviceId string, pageable model.Pageable) 
 	totalPage = int64(math.Ceil(float64(totalCount) / float64(pageable.Size)))
 
 	// 2. 正式查詢資料（分頁 + 排序）
-	err := r.read.Where("device_id = ?", deviceId).
+	err := r.read.WithContext(ctx).
+		Where("device_id = ?", deviceId).
 		Offset(pageable.Offset()).    // 分頁
 		Limit(pageable.Limit()).      // 每頁筆數
 		Order(pageable.OrderBySQL()). // 排序
@@ -43,10 +45,11 @@ func (r *tripRepoImpl) GetDeviceTrips(deviceId string, pageable model.Pageable) 
 	return deviceTrips, totalCount, totalPage, nil
 }
 
-func (r *tripRepoImpl) GetTripDetail(tripUuid string) (domainRepo.TripSummary, error) {
+func (r *tripRepoImpl) GetTripDetail(ctx context.Context, tripUuid string) (domainRepo.TripSummary, error) {
 	var trip domainRepo.TripSummary
 
-	err := r.read.Where("data_ref = ?", tripUuid).
+	err := r.read.WithContext(ctx).
+		Where("data_ref = ?", tripUuid).
 		First(&trip).Error
 	if err != nil {
 		// logafa.Error("查詢裝置行程失敗 data_ref=%s, error: %+v", tripUuid, err)

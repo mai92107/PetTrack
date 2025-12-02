@@ -2,10 +2,11 @@ package account
 
 import (
 	"PetTrack/core/global"
+	"context"
 	"fmt"
 )
 
-func (service *AccountServiceImpl) Register(ip, username, password, email, lastName, firstName, nickName string) (map[string]interface{}, error) {
+func (service *AccountServiceImpl) Register(ctx context.Context, ip, username, password, email, lastName, firstName, nickName string) (map[string]interface{}, error) {
 	// 參數驗證
 
 	err := validateRegister(email, nickName, username, password)
@@ -15,17 +16,17 @@ func (service *AccountServiceImpl) Register(ip, username, password, email, lastN
 
 	tx := service.db.Write.Begin()
 
-	memberId, err := service.memberRepo.CreateMember(tx, lastName, firstName, nickName, email)
+	memberId, err := service.memberRepo.CreateMember(tx, ctx, lastName, firstName, nickName, email)
 	if err != nil {
 		return nil, err
 	}
 
-	accountUuid, err := service.accountRepo.Create(tx, memberId, username, password, email)
+	accountUuid, err := service.accountRepo.Create(tx, ctx, memberId, username, password, email)
 	if err != nil {
 		return nil, err
 	}
 
-	err = service.passwordHistory.CreateHistory(tx, accountUuid, password)
+	err = service.passwordHistory.CreateHistory(tx, ctx, accountUuid, password)
 	if err != nil {
 		return nil, err
 	}
@@ -34,7 +35,7 @@ func (service *AccountServiceImpl) Register(ip, username, password, email, lastN
 		tx.Rollback()
 		return nil, fmt.Errorf(global.COMMON_SYSTEM_ERROR)
 	}
-	return service.Login(ip, username, password)
+	return service.Login(ctx, ip, username, password)
 }
 
 func validateRegister(email, nickName, username, password string) error {

@@ -5,16 +5,14 @@ import (
 	"fmt"
 )
 
-func (s *DeviceServiceImpl) Create(deviceType string, memberId int64) (string, error) {
+func (s *DeviceServiceImpl) Create(ctx context.Context, deviceType string, memberId int64) (string, error) {
 	deviceId := ""
 	if err := validateRequest(deviceType); err != nil {
 		return deviceId, err
 	}
-	// TODO: 暫時用background
-	ctx := context.Background()
 	deviceId = s.redisService.GenerateDeviceId(ctx)
 	// 取得用戶資料
-	err := s.deviceRepo.Create(deviceType, memberId, deviceId)
+	err := s.deviceRepo.Create(ctx, deviceType, memberId, deviceId)
 	return deviceId, err
 }
 

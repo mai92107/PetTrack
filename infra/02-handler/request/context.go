@@ -1,8 +1,14 @@
 package request
 
-import "time"
+import (
+	"context"
+	"time"
+)
 
 type RequestContext interface {
+
+	// 提供context
+	GetContext() context.Context
 
 	// 取得用戶ID
 	GetClientID() string
@@ -24,5 +30,4 @@ type RequestContext interface {
 
 	// 回覆錯誤
 	Error(code int, message string)
-	
 }

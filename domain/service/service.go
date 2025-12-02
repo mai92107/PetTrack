@@ -6,25 +6,25 @@ import (
 )
 
 type AccountService interface {
-	Login(ip, accountName, password string) (map[string]interface{}, error)
-	Register(ip, username, password, email, lastName, firstName, nickName string) (map[string]interface{}, error)
+	Login(ctx context.Context, ip, accountName, password string) (map[string]interface{}, error)
+	Register(ctx context.Context, ip, username, password, email, lastName, firstName, nickName string) (map[string]interface{}, error)
 }
 
 type DeviceService interface {
-	Create(deviceType string, memberId int64) (string, error)
-	OnlineDeviceList() ([]string, error)
-	DeviceList() ([]string, error)
-	GetDeviceTrips(member model.Claims, deviceId string, pageable model.Pageable) ([]map[string]interface{}, int64, int64, error)
-	GetTripDetail(member model.Claims, deviceId string, tripUuid string) (map[string]interface{}, error)
+	Create(ctx context.Context, deviceType string, memberId int64) (string, error)
+	OnlineDeviceList(ctx context.Context) ([]string, error)
+	DeviceList(ctx context.Context) ([]string, error)
+	GetDeviceTrips(ctx context.Context, member model.Claims, deviceId string, pageable model.Pageable) ([]map[string]interface{}, int64, int64, error)
+	GetTripDetail(ctx context.Context, member model.Claims, deviceId string, tripUuid string) (map[string]interface{}, error)
 }
 
 type MemberService interface {
-	AddDevice(memberId int64, deviceId, deviceName string) error
-	MemberDeviceList(memberId int64) ([]string, error)
+	AddDevice(ctx context.Context, memberId int64, deviceId, deviceName string) error
+	MemberDeviceList(ctx context.Context, memberId int64) ([]string, error)
 }
 
 type CommonService interface {
-	ValidateDeviceOwner(deviceId string, member model.Claims) error
+	ValidateDeviceOwner(ctx context.Context, deviceId string, member model.Claims) error
 }
 
 type RedisService interface {

@@ -3,6 +3,7 @@ package adapter
 import (
 	"PetTrack/infra/02-handler/request"
 	"PetTrack/infra/02-handler/response"
+	"context"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -18,6 +19,11 @@ func NewHttpContext(c *gin.Context) request.RequestContext {
 		ctx:         c,
 		requestTime: time.Now(),
 	}
+}
+
+// Create new context
+func (h *HTTPContext) GetContext() context.Context {
+	return h.ctx.Request.Context()
 }
 
 // BindJSON implements request.RequestContext.

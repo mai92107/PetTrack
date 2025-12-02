@@ -1,8 +1,10 @@
 package member
 
-func (s *MemberServiceImpl) MemberDeviceList(memberId int64) ([]string, error) {
+import "context"
+
+func (s *MemberServiceImpl) MemberDeviceList(ctx context.Context, memberId int64) ([]string, error) {
 	deviceIds := []string{}
-	deviceIds, err := s.memberDeviceRepo.GetMemberDeviceList(memberId)
+	deviceIds, err := s.memberDeviceRepo.GetMemberDeviceList(ctx, memberId)
 	if err != nil {
 		return deviceIds, err
 	}

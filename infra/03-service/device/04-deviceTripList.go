@@ -3,10 +3,11 @@ package device
 import (
 	"PetTrack/core/model"
 	"PetTrack/core/util/formatter"
+	"context"
 	"fmt"
 )
 
-func (s *DeviceServiceImpl) GetDeviceTrips(member model.Claims, deviceId string, pageable model.Pageable) ([]map[string]interface{}, int64, int64, error) {
+func (s *DeviceServiceImpl) GetDeviceTrips(ctx context.Context, member model.Claims, deviceId string, pageable model.Pageable) ([]map[string]interface{}, int64, int64, error) {
 	trips := []map[string]interface{}{}
 	var total int64
 	var totalPages int64
@@ -16,12 +17,12 @@ func (s *DeviceServiceImpl) GetDeviceTrips(member model.Claims, deviceId string,
 		return trips, total, totalPages, err
 	}
 
-	err = s.commonService.ValidateDeviceOwner(deviceId, member)
+	err = s.commonService.ValidateDeviceOwner(ctx, deviceId, member)
 	if err != nil {
 		return trips, total, totalPages, err
 	}
 
-	tripsData, total, totalPages, err := s.tripRepo.GetDeviceTrips(deviceId, pageable)
+	tripsData, total, totalPages, err := s.tripRepo.GetDeviceTrips(ctx, deviceId, pageable)
 	if err != nil {
 		return trips, total, totalPages, err
 	}

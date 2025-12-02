@@ -3,11 +3,12 @@ package account
 import (
 	cryptoUtil "PetTrack/core/util/crypto"
 	jwtUtil "PetTrack/core/util/jwt"
+	"context"
 	"fmt"
 	"time"
 )
 
-func (service *AccountServiceImpl) Login(ip, accountName, password string) (map[string]interface{}, error) {
+func (service *AccountServiceImpl) Login(ctx context.Context, ip, accountName, password string) (map[string]interface{}, error) {
 	// 參數驗證
 	if err := validateLogin(accountName, password); err != nil {
 		return nil, err
@@ -17,7 +18,7 @@ func (service *AccountServiceImpl) Login(ip, accountName, password string) (map[
 	data := map[string]interface{}{}
 
 	// 驗證帳號
-	userAccount, err := service.accountRepo.FindByAccountName(accountName)
+	userAccount, err := service.accountRepo.FindByAccountName(ctx, accountName)
 	if err != nil {
 		return data, err
 	}
@@ -27,7 +28,7 @@ func (service *AccountServiceImpl) Login(ip, accountName, password string) (map[
 		return data, fmt.Errorf("密碼錯誤")
 	}
 
-	err = service.accountRepo.UpdateLoginTime(userAccount.Uuid)
+	err = service.accountRepo.UpdateLoginTime(ctx, userAccount.Uuid)
 	if err != nil {
 		return data, err
 	}

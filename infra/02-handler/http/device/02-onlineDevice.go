@@ -16,7 +16,7 @@ func OnlineDeviceList(ctx request.RequestContext) {
 		ctx.Error(http.StatusForbidden, "身份認證錯誤")
 		return
 	}
-	deviceList, err := handler.DeviceService.OnlineDeviceList()
+	deviceList, err := handler.DeviceService.OnlineDeviceList(ctx.GetContext())
 	if err != nil {
 		// logafa.Error("系統發生錯誤, error: %+v", err)
 		ctx.Error(http.StatusInternalServerError, global.COMMON_SYSTEM_ERROR)

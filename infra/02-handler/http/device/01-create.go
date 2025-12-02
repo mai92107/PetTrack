@@ -25,7 +25,7 @@ func Create(ctx request.RequestContext) {
 		ctx.Error(http.StatusForbidden, "身份認證錯誤")
 		return
 	}
-	deviceId, err := handler.DeviceService.Create(req.DeviceType, userData.MemberId)
+	deviceId, err := handler.DeviceService.Create(ctx.GetContext(), req.DeviceType, userData.MemberId)
 	if err != nil {
 		// logafa.Error("裝置新增失敗，請稍後嘗試, error: %+v", err)
 		ctx.Error(http.StatusInternalServerError, global.COMMON_SYSTEM_ERROR)

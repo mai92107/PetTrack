@@ -1,8 +1,10 @@
 package device
 
-func (s *DeviceServiceImpl) DeviceList() ([]string, error) {
+import "context"
+
+func (s *DeviceServiceImpl) DeviceList(ctx context.Context) ([]string, error) {
 	deviceIds := []string{}
-	deviceIds, err := s.deviceRepo.GetDeviceList()
+	deviceIds, err := s.deviceRepo.GetDeviceList(ctx)
 	if err != nil {
 		return deviceIds, err
 	}

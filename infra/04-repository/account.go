@@ -4,6 +4,7 @@ import (
 	"PetTrack/core/global"
 	"PetTrack/core/model"
 	domain "PetTrack/domain/repo"
+	"context"
 	"fmt"
 	"strings"
 
@@ -11,14 +12,14 @@ import (
 	"gorm.io/gorm"
 )
 
-func (r *accountRepoImpl) FindByAccountName(accountName string) (*domain.Account, error) {
+func (r *accountRepoImpl) FindByAccountName(ctx context.Context, accountName string) (*domain.Account, error) {
 	account := &domain.Account{}
 	var err error
 
 	if strings.Contains(accountName, "@") {
-		err = r.read.First(&account, "username = ?", accountName).Error
+		err = r.read.WithContext(ctx).First(&account, "username = ?", accountName).Error
 	} else {
-		err = r.read.First(&account, "email = ?", accountName).Error
+		err = r.read.WithContext(ctx).First(&account, "email = ?", accountName).Error
 	}
 
 	if err != nil {
@@ -28,8 +29,8 @@ func (r *accountRepoImpl) FindByAccountName(accountName string) (*domain.Account
 	return account, nil
 }
 
-func (r *accountRepoImpl) UpdateLoginTime(uuid uuid.UUID) error {
-	err := r.write.Model(&domain.Account{}).Where("uuid = ?", uuid).Update("last_login_time", gorm.Expr("NOW()")).Error
+func (r *accountRepoImpl) UpdateLoginTime(ctx context.Context, uuid uuid.UUID) error {
+	err := r.write.WithContext(ctx).Model(&domain.Account{}).Where("uuid = ?", uuid).Update("last_login_time", gorm.Expr("NOW()")).Error
 	if err != nil {
 		// logafa.Error("更新最後登入時間發生錯誤, error: %+v", err)
 		return fmt.Errorf("更新最後登入時間發生錯誤")
@@ -37,7 +38,7 @@ func (r *accountRepoImpl) UpdateLoginTime(uuid uuid.UUID) error {
 	return nil
 }
 
-func (r *accountRepoImpl) Create(tx *gorm.DB, memberId int64, username, password, email string) (uuid.UUID, error) {
+func (r *accountRepoImpl) Create(tx *gorm.DB, ctx context.Context, memberId int64, username, password, email string) (uuid.UUID, error) {
 	account := &domain.Account{
 		Uuid:          uuid.New(),
 		MemberId:      memberId,
@@ -47,7 +48,7 @@ func (r *accountRepoImpl) Create(tx *gorm.DB, memberId int64, username, password
 		Identity:      model.MEMBER.ToString(),
 		LastLoginTime: global.GetNow(),
 	}
-	err := r.write.Create(&account).Error
+	err := r.write.WithContext(ctx).Create(&account).Error
 	if err != nil {
 		if strings.Contains(err.Error(), "Duplicate entry") {
 			if strings.Contains(err.Error(), "username") {

@@ -3,22 +3,23 @@ package device
 import (
 	"PetTrack/core/model"
 	"PetTrack/core/util/formatter"
+	"context"
 	"fmt"
 )
 
-func (s *DeviceServiceImpl) GetTripDetail(member model.Claims, deviceId string, tripUuid string) (map[string]interface{}, error) {
+func (s *DeviceServiceImpl) GetTripDetail(ctx context.Context, member model.Claims, deviceId string, tripUuid string) (map[string]interface{}, error) {
 	trip := map[string]interface{}{}
 
 	err := validateTripDetailRequest(deviceId, tripUuid)
 	if err != nil {
 		return trip, err
 	}
-	err = s.commonService.ValidateDeviceOwner(deviceId, member)
+	err = s.commonService.ValidateDeviceOwner(ctx, deviceId, member)
 	if err != nil {
 		return trip, err
 	}
 
-	tripData, err := s.tripRepo.GetTripDetail(tripUuid)
+	tripData, err := s.tripRepo.GetTripDetail(ctx, tripUuid)
 	if err != nil {
 		return trip, err
 	}

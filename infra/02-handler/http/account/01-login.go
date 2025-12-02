@@ -18,7 +18,7 @@ func Login(ctx request.RequestContext) {
 		ctx.Error(http.StatusBadRequest, global.COMMON_REQUEST_ERROR)
 		return
 	}
-	data, err := handler.AccountService.Login(ctx.GetClientIP(), req.UserAccount, req.Password)
+	data, err := handler.AccountService.Login(ctx.GetContext(), ctx.GetClientIP(), req.UserAccount, req.Password)
 	if err != nil {
 		ctx.Error(http.StatusInternalServerError, global.COMMON_SYSTEM_ERROR)
 		return

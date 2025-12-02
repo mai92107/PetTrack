@@ -8,6 +8,7 @@ import (
 	"PetTrack/infra/02-handler/http/member"
 	"PetTrack/infra/02-handler/http/test"
 	"PetTrack/infra/02-handler/request"
+	"time"
 
 	"github.com/gin-gonic/gin"
 )
@@ -17,7 +18,7 @@ func RegisterRoutes(r *gin.Engine) {
 	const ADMIN = middleware.PermAdmin
 	const MEMBER = middleware.PermMember
 
-	r.Use(middleware.WorkerMiddleware())
+	r.Use(middleware.WorkerMiddleware(), middleware.TimeoutMiddleware(3*time.Second))
 
 	// 註冊路由
 	// TODO: 未來需要檢查ip body header 在路徑後加上IdentityRequired檢查

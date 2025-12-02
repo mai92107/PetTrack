@@ -3,6 +3,7 @@ package adapter
 import (
 	"PetTrack/infra/02-handler/request"
 	"PetTrack/infra/02-handler/response"
+	"context"
 	"errors"
 	"time"
 
@@ -28,6 +29,13 @@ func NewMQTTContext(client *mqtt.Client, payload, jwt, clientID, ip string, requ
 		ip:          ip,
 		requestTime: requestTime,
 	}
+}
+
+// Create new context
+func (m *MQTTContext) GetContext() context.Context {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+	return ctx
 }
 
 // BindJSON implements request.RequestContext.

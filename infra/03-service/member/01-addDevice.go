@@ -1,17 +1,20 @@
 package member
 
-import "fmt"
+import (
+	"context"
+	"fmt"
+)
 
-func (s *MemberServiceImpl) AddDevice(memberId int64, deviceId, deviceName string) error {
+func (s *MemberServiceImpl) AddDevice(ctx context.Context, memberId int64, deviceId, deviceName string) error {
 	err := validateRequest(deviceId)
 	if err != nil {
 		return err
 	}
-	_, err = s.deviceRepo.FindDeviceById(deviceId)
+	_, err = s.deviceRepo.FindDeviceById(ctx, deviceId)
 	if err != nil {
 		return err
 	}
-	err = s.memberDeviceRepo.AddDevice(memberId, deviceId, deviceName)
+	err = s.memberDeviceRepo.AddDevice(ctx, memberId, deviceId, deviceName)
 	if err != nil {
 		return err
 	}

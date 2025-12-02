@@ -4,6 +4,7 @@ import (
 	"PetTrack/core/model"
 	domainRepo "PetTrack/domain/repo"
 	domainService "PetTrack/domain/service"
+	"context"
 	"fmt"
 	"slices"
 )
@@ -22,12 +23,12 @@ func NewCommonService(
 	}
 }
 
-func (s *CommonServiceImpl) ValidateDeviceOwner(deviceId string, member model.Claims) error {
+func (s *CommonServiceImpl) ValidateDeviceOwner(ctx context.Context, deviceId string, member model.Claims) error {
 	if member.Identity == "ADMIN" {
 		return nil
 	}
 
-	deviceIds, err := s.memberDeviceRepo.GetMemberDeviceList(member.MemberId)
+	deviceIds, err := s.memberDeviceRepo.GetMemberDeviceList(ctx, member.MemberId)
 	if err != nil {
 		return err
 	}

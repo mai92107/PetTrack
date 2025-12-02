@@ -2,17 +2,18 @@ package repo
 
 import (
 	domainRepo "PetTrack/domain/repo"
+	"context"
 	"fmt"
 )
 
-func (r *memberDeviceRepoImpl) AddDevice(memberId int64, deviceId, deviceName string) error {
+func (r *memberDeviceRepoImpl) AddDevice(ctx context.Context, memberId int64, deviceId, deviceName string) error {
 
 	memberDevice := domainRepo.MemberDevice{
 		MemberId:   memberId,
 		DeviceId:   deviceId,
 		DeviceName: deviceName,
 	}
-	err := r.write.Create(&memberDevice).Error
+	err := r.write.WithContext(ctx).Create(&memberDevice).Error
 	if err != nil {
 		// logafa.Error("新增使用者裝置失敗, error: %+v", err)
 		return fmt.Errorf("新增使用者裝置失敗")
@@ -20,9 +21,10 @@ func (r *memberDeviceRepoImpl) AddDevice(memberId int64, deviceId, deviceName st
 	return nil
 }
 
-func (r *memberDeviceRepoImpl) GetMemberDeviceList(memberId int64) ([]string, error) {
+func (r *memberDeviceRepoImpl) GetMemberDeviceList(ctx context.Context, memberId int64) ([]string, error) {
 	var deviceIds []string
-	err := r.read.Model(&domainRepo.MemberDevice{}).
+	err := r.read.WithContext(ctx).
+		Model(&domainRepo.MemberDevice{}).
 		Pluck("device_id", &deviceIds).
 		Where("member_id = ?", memberId).Error
 	if err != nil {
