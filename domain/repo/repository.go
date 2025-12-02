@@ -29,11 +29,11 @@ type DeviceRepository interface {
 }
 
 type TripRepository interface {
-	GetDeviceTrips(deviceId string, pageable model.Pageable) ([]TripSummary, int64, int64, error)
-	GetTripDetail(tripUuid string) (TripSummary, error)
-	SaveLocationToDB(records []DeviceLocation) error
-	ReadTripFromMongo(timeDuration int) ([]TripSummary, error)
-	SaveTripToDB(results []TripSummary) error
+	GetDeviceTrips(ctx context.Context, deviceId string, pageable model.Pageable) ([]TripSummary, int64, int64, error)
+	GetTripDetail(ctx context.Context, tripUuid string) (TripSummary, error)
+	SaveLocationToDB(ctx context.Context, records []DeviceLocation) error
+	ReadTripFromMongo(ctx context.Context, timeDuration int) ([]TripSummary, error)
+	SaveTripToDB(ctx context.Context, results []TripSummary) error
 }
 
 type MemberDeviceRepository interface {

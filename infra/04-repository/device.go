@@ -1,7 +1,6 @@
 package repo
 
 import (
-	domain "PetTrack/domain/repo"
 	domainRepo "PetTrack/domain/repo"
 	"context"
 	"fmt"
@@ -10,7 +9,7 @@ import (
 )
 
 func (r *deviceRepoImpl) Create(ctx context.Context, deviceType string, memberId int64, deviceId string) error {
-	device := &domain.Device{
+	device := &domainRepo.Device{
 		Uuid:           uuid.New(),
 		DeviceId:       deviceId,
 		DeviceType:     deviceType,

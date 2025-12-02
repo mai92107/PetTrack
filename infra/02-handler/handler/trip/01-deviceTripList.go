@@ -29,7 +29,7 @@ func DeviceTrips(ctx request.RequestContext) {
 		ctx.Error(http.StatusForbidden, "身份認證錯誤")
 		return
 	}
-	datas, total, totalPages, err := handler.TripService.GetDeviceTrips(*userInfo, ctx.GetContext(), req.DeviceId, model.NewPageable(&req.Page, &req.Size, req.Direction, req.OrderBy))
+	datas, total, totalPages, err := handler.TripService.GetDeviceTrips(ctx.GetContext(), *userInfo, req.DeviceId, model.NewPageable(&req.Page, &req.Size, req.Direction, req.OrderBy))
 	if err != nil {
 		// logafa.Error("系統發生錯誤, error: %+v", err)
 		ctx.Error(http.StatusInternalServerError, global.COMMON_SYSTEM_ERROR)

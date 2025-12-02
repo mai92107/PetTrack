@@ -67,14 +67,10 @@ func (r *tripRepoImpl) GetTripDetail(ctx context.Context, tripUuid string) (doma
 	return trip, nil
 }
 
-func (r *tripRepoImpl) SaveLocationToDB(records []domainRepo.DeviceLocation) error {
+func (r *tripRepoImpl) SaveLocationToDB(ctx context.Context, records []domainRepo.DeviceLocation) error {
 	if len(records) < 1 {
 		return fmt.Errorf("無有效紀錄可存入資料庫")
 	}
-
-	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
-	defer cancel()
-
 	// 使用 BulkWrite 進行 upsert,防止重複資料
 	var operations []mongo.WriteModel
 	for _, record := range records {
@@ -113,8 +109,7 @@ func (r *tripRepoImpl) SaveLocationToDB(records []domainRepo.DeviceLocation) err
 	return nil
 }
 
-func (r *tripRepoImpl) ReadTripFromMongo(timeDuration int) ([]domainRepo.TripSummary, error) {
-	ctx := context.Background()
+func (r *tripRepoImpl) ReadTripFromMongo(ctx context.Context, timeDuration int) ([]domainRepo.TripSummary, error) {
 	coll := r.mongo.Collection("pettrack")
 
 	duration := time.Now().UTC().Add(time.Minute * -(time.Duration(timeDuration)))
@@ -174,8 +169,8 @@ func (r *tripRepoImpl) ReadTripFromMongo(timeDuration int) ([]domainRepo.TripSum
 	return results, nil
 }
 
-func (r *tripRepoImpl) SaveTripToDB(results []domainRepo.TripSummary) error {
-	tx := r.write.Begin()
+func (r *tripRepoImpl) SaveTripToDB(ctx context.Context, results []domainRepo.TripSummary) error {
+	tx := r.write.WithContext(ctx).Begin()
 	if err := tx.Error; err != nil {
 		return fmt.Errorf("開始交易失敗: %w", err)
 	}

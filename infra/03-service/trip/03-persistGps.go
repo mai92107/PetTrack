@@ -9,10 +9,9 @@ import (
 	jsoniter "github.com/json-iterator/go"
 )
 
-func (s *TripServiceImpl) SaveGpsFmRdsToMongo() {
+func (s *TripServiceImpl) SaveGpsFmRdsToMongo(ctx context.Context) {
 	logafa.Info("開始執行 GPS DATA 持久化...")
 
-	ctx := context.Background()
 	deviceKeyPattern := "device:*"
 	keys, err := s.redisUtil.KeyScan(ctx, deviceKeyPattern)
 	if err != nil {
@@ -58,7 +57,7 @@ func (s *TripServiceImpl) SaveGpsFmRdsToMongo() {
 			records = append(records, record)
 		}
 
-		if err = s.tripRepo.SaveLocationToDB(records); err != nil {
+		if err = s.tripRepo.SaveLocationToDB(ctx, records); err != nil {
 			logafa.Error("批次寫入資料至 DB 失敗", "error", err)
 			continue
 		}

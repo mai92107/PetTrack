@@ -11,16 +11,16 @@ type AccountService interface {
 }
 
 type DeviceService interface {
-	Create(deviceType string, memberId int64) (string, error)
-	OnlineDeviceList() ([]string, error)
-	DeviceList() ([]string, error)
+	Create(ctx context.Context, deviceType string, memberId int64) (string, error)
+	OnlineDeviceList(ctx context.Context) ([]string, error)
+	DeviceList(ctx context.Context) ([]string, error)
 }
 
 type TripService interface {
-	GetDeviceTrips(member model.Claims, deviceId string, pageable model.Pageable) ([]map[string]interface{}, int64, int64, error)
-	GetTripDetail(member model.Claims, deviceId string, tripUuid string) (map[string]interface{}, error)
-	SaveGpsFmRdsToMongo()
-	FlushTripFmMongoToMaria(timeDuration int)
+	GetDeviceTrips(ctx context.Context, member model.Claims, deviceId string, pageable model.Pageable) ([]map[string]interface{}, int64, int64, error)
+	GetTripDetail(ctx context.Context, member model.Claims, deviceId string, tripUuid string) (map[string]interface{}, error)
+	SaveGpsFmRdsToMongo(ctx context.Context)
+	FlushTripFmMongoToMaria(ctx context.Context, timeDuration int)
 }
 
 type MemberService interface {

@@ -2,6 +2,7 @@ package cron
 
 import (
 	"PetTrack/core/util/logafa"
+	"context"
 	"sync"
 	"time"
 
@@ -42,7 +43,7 @@ var cronSpecs = map[CronType]cronInfo{
 	Day:      {spec: "35 0 0 * * *", infoName: "每天"},
 }
 
-func executeJob(c *cron.Cron, cronType CronType, jobs []func()) {
+func executeJob(c *cron.Cron, cronType CronType, jobs []func(context.Context)) {
 	// 沒工作就離開
 	if len(jobs) == 0 {
 		return
@@ -63,7 +64,7 @@ func executeJob(c *cron.Cron, cronType CronType, jobs []func()) {
 }
 
 // 工人分配執行工作
-func submitJobAsync(job func(), localWg *sync.WaitGroup) {
+func submitJobAsync(job func(context.Context), localWg *sync.WaitGroup) {
 	// wg.Add(1)
 	// <-global.NormalWorkerPool // 取得 worker
 	// localWg.Add(1)
@@ -74,7 +75,9 @@ func submitJobAsync(job func(), localWg *sync.WaitGroup) {
 		// 	global.NormalWorkerPool <- struct{}{}
 		// }()
 		start := time.Now().UTC()
-		job()
+		ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+		defer cancel()
+		job(ctx)
 		logafa.Debug("單一任務完成", "耗時", time.Since(start))
 	}()
 }

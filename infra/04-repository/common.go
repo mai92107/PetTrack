@@ -2,7 +2,6 @@ package repo
 
 import (
 	bun "PetTrack/core/model/bunMachines"
-	domain "PetTrack/domain/repo"
 	domainRepo "PetTrack/domain/repo"
 
 	"go.mongodb.org/mongo-driver/mongo"
@@ -16,7 +15,7 @@ type accountRepoImpl struct {
 
 func NewAccountRepository(
 	db *bun.DB,
-) domain.AccountRepository {
+) domainRepo.AccountRepository {
 	return &accountRepoImpl{write: db.Write, read: db.Read}
 }
 
@@ -27,7 +26,7 @@ type memberRepoImpl struct {
 
 func NewMemberRepository(
 	db *bun.DB,
-) domain.MemberRepository {
+) domainRepo.MemberRepository {
 	return &memberRepoImpl{write: db.Write, read: db.Read}
 }
 
@@ -38,7 +37,7 @@ type passwordRepoImpl struct {
 
 func NewPasswordRepository(
 	db *bun.DB,
-) domain.PasswordRepository {
+) domainRepo.PasswordRepository {
 	return &passwordRepoImpl{write: db.Write, read: db.Read}
 }
 
