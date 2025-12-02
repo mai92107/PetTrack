@@ -19,10 +19,15 @@ func RegisterRoutes(r *gin.Engine) {
 	const ADMIN = middleware.PermAdmin
 	const MEMBER = middleware.PermMember
 
-	r.Use(middleware.WorkerMiddleware(), middleware.TimeoutMiddleware(3*time.Second))
+	r.Use(
+		// TODO: 未來需要檢查
+		// ip: 看地區
+		// header:
+		// body:
+		middleware.TimeoutMiddleware(3*time.Second),
+		middleware.WorkerMiddleware(),
+	)
 
-	// 註冊路由
-	// TODO: 未來需要檢查ip body header 在路徑後加上IdentityRequired檢查
 	// 依類別分組
 	homeGroup := r.Group("/home")
 	{

@@ -1,1 +1,7 @@
 log/
+
+# Ignore everything inside docker/
+docker/*
+
+# But keep docker-compose.yml
+!docker/docker-compose.yml

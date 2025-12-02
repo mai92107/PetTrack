@@ -24,25 +24,3 @@ var (
 	PriorWorkerPool  chan struct{}
 	NormalWorkerPool chan struct{}
 )
-
-// type Repo struct {
-// 	DB    *DataBase
-// 	Cache *Cache
-// }
-// type DataBase struct {
-// 	MariaDb *SqlDB
-// 	MongoDb *NoSqlDB
-// }
-// type SqlDB struct {
-// 	Reading *gorm.DB
-// 	Writing *gorm.DB
-// }
-// type NoSqlDB struct {
-// 	Reading *mongo.Database
-// 	Writing *mongo.Database
-// }
-// type Cache struct {
-// 	Reading *redis.Client
-// 	Writing *redis.Client
-// 	CTX     context.Context
-// }

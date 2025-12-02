@@ -20,21 +20,7 @@ import (
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 )
 
-type MqttHandler func(cleint *mqtt.Client, payload, jwt, clientId, ip string, requestTime time.Time)
-
-type Permission int
-
-const (
-	PermGuest Permission = iota
-	PermMember
-	PermAdmin
-)
-
-type Route struct {
-	Handler    MqttHandler
-	Permission Permission
-}
-
+// MQTT route
 var mqttRoutes = map[string]Route{
 	// Guest (無需 JWT)
 	"account_login":    {Handler: executeMqtt(account.Login), Permission: PermGuest},
@@ -54,6 +40,21 @@ var mqttRoutes = map[string]Route{
 	"member_devices":   {Handler: executeMqtt(member.MemberDeviceList), Permission: PermMember},
 	"trip_list":        {Handler: executeMqtt(trip.DeviceTrips), Permission: PermMember},
 	"trip":             {Handler: executeMqtt(trip.TripDetail), Permission: PermMember},
+}
+
+type MqttHandler func(cleint *mqtt.Client, payload, jwt, clientId, ip string, requestTime time.Time)
+
+type Permission int
+
+const (
+	PermGuest Permission = iota
+	PermMember
+	PermAdmin
+)
+
+type Route struct {
+	Handler    MqttHandler
+	Permission Permission
 }
 
 // topic sample : req/action/clientId/jwt/ip

@@ -1,6 +1,7 @@
 package cron
 
 import (
+	"PetTrack/infra/00-core/global"
 	"PetTrack/infra/00-core/util/logafa"
 	"context"
 	"sync"
@@ -65,15 +66,15 @@ func executeJob(c *cron.Cron, cronType CronType, jobs []func(context.Context)) {
 
 // 工人分配執行工作
 func submitJobAsync(job func(context.Context), localWg *sync.WaitGroup) {
-	// wg.Add(1)
-	// <-global.NormalWorkerPool // 取得 worker
-	// localWg.Add(1)
+	wg.Add(1)
+	<-global.NormalWorkerPool // 取得 worker
+	localWg.Add(1)
 	go func() {
-		// defer func() {
-		// 	wg.Done()
-		// 	localWg.Done()
-		// 	global.NormalWorkerPool <- struct{}{}
-		// }()
+		defer func() {
+			wg.Done()
+			localWg.Done()
+			global.NormalWorkerPool <- struct{}{}
+		}()
 		start := time.Now().UTC()
 		ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 		defer cancel()

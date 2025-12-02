@@ -3,6 +3,7 @@ package main
 import (
 	"PetTrack/infra/00-core/cron"
 	"PetTrack/infra/00-core/util/logafa"
+	initial "PetTrack/infra/00-init"
 	router "PetTrack/infra/01-router"
 	"context"
 	"fmt"
@@ -16,7 +17,7 @@ import (
 )
 
 func main() {
-	// initial.Init()
+	initial.Init()
 
 	srv := initServer()
 	gracefulShutdown(srv)
