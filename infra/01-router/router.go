@@ -31,7 +31,7 @@ func RegisterRoutes(r *gin.Engine) {
 	// 依類別分組
 	homeGroup := r.Group("/home")
 	{
-		homeGroup.GET("/hello", executeHttp(test.SayHello))
+		homeGroup.POST("/hello", executeHttp(test.SayHello))
 	}
 
 	accountGroup := r.Group("/account")

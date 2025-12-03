@@ -1,6 +1,9 @@
 package initMethod
 
 import (
+	"PetTrack/infra/00-core/model"
+	bun "PetTrack/infra/00-core/model/bunMachines"
+	"PetTrack/infra/00-core/util/logafa"
 	"context"
 	"fmt"
 	"time"
@@ -12,25 +15,53 @@ import (
 	"gorm.io/gorm"
 )
 
-func InitDB(host, port, user, password, database string) (*gorm.DB, error) {
+func InitDB(cfg model.Config) *bun.DB {
+	db, err := initDataBase(
+		cfg.Machines.MariaDB.Host,
+		cfg.Machines.MariaDB.Port,
+		cfg.Machines.MariaDB.User,
+		cfg.Machines.MariaDB.Password,
+		cfg.Machines.MariaDB.Name,
+	)
+	if err != nil {
+		return nil
+	}
+	return db
+}
+func initDataBase(host, port, user, password, database string) (*bun.DB, error) {
 	// 暫時共用
 	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=UTC",
 		user, password, host, port, database)
-
 	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{
 		// Logger: logafa.NewGormLogger(),
 	})
 	if err != nil {
+		logafa.Error(" ❌ 無法連接讀取資料庫", "error", err)
 		return nil, err
-		// logafa.Error(" ❌ 無法連接讀取資料庫: %v", err)
 	}
 
-	// logafa.Debug(" ✅ 資料庫連接成功")
+	logafa.Debug(" ✅ 資料庫連接成功")
 	initSQLTables(db)
-	return db, nil
+	return &bun.DB{
+		Write: db,
+		Read:  db,
+	}, nil
 }
 
-func InitMongo(host, port, user, password string) (*mongo.Database, error) {
+func InitMongo(cfg model.Config) *mongo.Database {
+	mongo, err := initMongoDB(
+		cfg.Machines.MongoDB.Host,
+		cfg.Machines.MongoDB.Port,
+		cfg.Machines.MongoDB.User,
+		cfg.Machines.MongoDB.Password,
+	)
+	if err != nil {
+		return nil
+	}
+	return mongo
+}
+
+func initMongoDB(host, port, user, password string) (*mongo.Database, error) {
 	uri := fmt.Sprintf("mongodb://%s:%s@%s:%s",
 		user, password, host, port)
 
@@ -43,14 +74,13 @@ func InitMongo(host, port, user, password string) (*mongo.Database, error) {
 	// TODO: 增加retry
 	client, err := mongo.Connect(ctx, clientOptions)
 	if err != nil {
-		// logafa.Error("無法連接 Mongodb, error: %+v", err)
+		logafa.Error("無法連接 Mongodb", "error", err)
 		return nil, err
 	}
-	// logafa.Debug("✅ 成功連線 MongoDB!")
+	logafa.Debug("✅ 成功連線 MongoDB!")
 
 	// 初始化index
 	initMongoIndexes(client)
-
 	return client.Database("pettrack"), nil
 }
 

@@ -2,6 +2,7 @@ package member
 
 import (
 	"PetTrack/infra/00-core/global"
+	"PetTrack/infra/00-core/util/logafa"	
 	handler "PetTrack/infra/02-handler/handler"
 	"PetTrack/infra/02-handler/request"
 	"net/http"
@@ -19,7 +20,7 @@ func MemberDeviceList(ctx request.RequestContext) {
 	}
 	deviceIds, err := handler.MemberService.MemberDeviceList(ctx.GetContext(), req.MemberId)
 	if err != nil {
-		// logafa.Error("系統發生錯誤, error: %+v", err)
+		logafa.Error("系統發生錯誤", "error", err)
 		ctx.Error(http.StatusInternalServerError, global.COMMON_SYSTEM_ERROR)
 		return
 	}

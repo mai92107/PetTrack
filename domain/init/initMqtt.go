@@ -2,6 +2,7 @@ package initMethod
 
 import (
 	"PetTrack/infra/00-core/global"
+	"PetTrack/infra/00-core/model"
 	"PetTrack/infra/00-core/util/logafa"
 	"fmt"
 	"sync"
@@ -15,8 +16,12 @@ var (
 	subscribedTopics  = make(map[string]bool)
 )
 
+func InitMqtt(cfg model.Config) *mqtt.Client {
+	return initMqtt(cfg.Machines.MqttBroker.HostCloud, cfg.Machines.MqttBroker.Port, cfg.Machines.MqttBroker.User, cfg.Machines.MqttBroker.Password, cfg.Machines.MqttBroker.Topic)
+}
+
 // InitMosquitto 初始化 MQTT 連線
-func InitMosquitto(host, port, username, password string, handler mqtt.MessageHandler, topics []string) mqtt.Client {
+func initMqtt(host, port, username, password string, topics []string) *mqtt.Client {
 
 	clientId := "bunbun"
 
@@ -27,7 +32,7 @@ func InitMosquitto(host, port, username, password string, handler mqtt.MessageHa
 		SetPassword(password).
 		SetKeepAlive(120 * time.Second).
 		SetPingTimeout(10 * time.Second).
-		SetDefaultPublishHandler(handler).
+		SetDefaultPublishHandler(onMessageReceived).
 		SetAutoReconnect(true).
 		SetConnectRetry(true).
 		SetConnectRetryInterval(5 * time.Second).
@@ -55,7 +60,7 @@ func InitMosquitto(host, port, username, password string, handler mqtt.MessageHa
 	// 更新連線狀態
 	global.IsConnected.Swap(true)
 	logafa.Debug("✅ MQTT 客戶端初始化成功")
-	return client
+	return &client
 }
 
 func subscribeVagueTopic(client mqtt.Client, vagueTopic []string) {
@@ -88,4 +93,12 @@ func onConnectionLost(client mqtt.Client, err error) {
 	// 更新連線狀態
 	global.IsConnected.Swap(false)
 	subscriptionMutex.Unlock()
+}
+
+func onMessageReceived(client mqtt.Client, msg mqtt.Message) {
+	payload := string(msg.Payload())
+	topic := msg.Topic()
+
+	logafa.Debug("收到 MQTT 訊息", "topic", topic, "payload", payload)
+	// ProcessMsg(payload, topic, client)
 }

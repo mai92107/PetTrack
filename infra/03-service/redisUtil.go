@@ -17,7 +17,7 @@ type redisServiceImpl struct {
 	redisUtil domainRepo.RedisRepository
 }
 
-func NewRedisRepository(
+func NewRedisService(
 	client *redis.Client,
 	redis domainRepo.RedisRepository,
 ) domainService.RedisService {

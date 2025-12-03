@@ -24,7 +24,7 @@ import (
 var mqttRoutes = map[string]Route{
 
 	"home_hello": {Handler: executeMqtt(test.SayHello), Permission: PermGuest},
-	
+
 	// account
 	"account_login":    {Handler: executeMqtt(account.Login), Permission: PermGuest},
 	"account_register": {Handler: executeMqtt(account.Register), Permission: PermGuest},
@@ -82,13 +82,8 @@ func RouteFunction(client mqtt.Client, action, payload, clientId, jwt, ip string
 	routeInfo.Handler(client, payload, jwt, clientId, ip, requestTime)
 }
 
-func OnMessageReceived(client mqtt.Client, msg mqtt.Message) {
-	requestTime := global.GetNow()
-	payload := string(msg.Payload())
-	topic := msg.Topic()
-
-	logafa.Debug("收到 MQTT 訊息", "topic", topic, "payload", payload)
-
+func ProcessMsg(payload, topic string, client mqtt.Client){
+	now := global.GetNow()
 	action, clientId, jwt, ip := extractInfoFromTopic(topic)
 	if action == "" || ip == "" {
 		logafa.Warn("無法解析 action 或 ip", "topic", topic)
@@ -105,7 +100,7 @@ func OnMessageReceived(client mqtt.Client, msg mqtt.Message) {
 				logafa.Error("MQTT handler panic:", "error", r, "topic", topic)
 			}
 		}()
-		RouteFunction(client, action, payload, clientId, jwt, ip, requestTime)
+		RouteFunction(client, action, payload, clientId, jwt, ip, now)
 	}()
 }
 

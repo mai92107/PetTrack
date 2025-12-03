@@ -5,7 +5,7 @@ import (
 	"PetTrack/infra/00-core/model"
 	jwtUtil "PetTrack/infra/00-core/util/jwt"
 	"PetTrack/infra/00-core/util/logafa"
-	handler "PetTrack/infra/02-handler/handler"
+	"PetTrack/infra/02-handler/handler"
 	"PetTrack/infra/02-handler/request"
 	"PetTrack/infra/02-handler/response"
 	"net/http"
