@@ -1,5 +1,5 @@
 // middleware/jwt.go
-package middleware
+package router
 
 import (
 	"PetTrack/infra/00-core/model"

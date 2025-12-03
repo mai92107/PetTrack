@@ -6,7 +6,7 @@ import (
 	"PetTrack/infra/00-core/model"
 	"PetTrack/infra/00-core/util/logafa"
 	"PetTrack/infra/00-init/wire"
-	router "PetTrack/infra/01-router"
+	router "PetTrack/infra/01-router/http"
 	handler "PetTrack/infra/02-handler/handler"
 	"context"
 	"fmt"

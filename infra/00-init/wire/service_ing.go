@@ -1,15 +1,19 @@
 package wire
 
 import (
+	initMethod "PetTrack/domain/init"
 	domainRepo "PetTrack/domain/repo"
 	domainService "PetTrack/domain/service"
+	"PetTrack/infra/00-core/model"
 	bun "PetTrack/infra/00-core/model/bunMachines"
+	mqttHandler "PetTrack/infra/01-router/mqtt"
 	service "PetTrack/infra/03-service"
 	"PetTrack/infra/03-service/account"
 	"PetTrack/infra/03-service/device"
 	"PetTrack/infra/03-service/member"
 	"PetTrack/infra/03-service/trip"
 
+	mqtt "github.com/eclipse/paho.mqtt.golang"
 	"github.com/google/wire"
 	"github.com/redis/go-redis/v9"
 )
@@ -21,6 +25,10 @@ var serviceSet = wire.NewSet(
 	provideDeviceService,
 	provideMemberService,
 	provideTripService,
+
+	provideMqttHandler,
+	provideMqtt,
+
 	InitServices,
 )
 
@@ -31,6 +39,7 @@ type Services struct {
 	Common  domainService.CommonService
 	Redis   domainService.RedisService
 	Trip    domainService.TripService
+	mqtt    *mqtt.Client
 }
 
 func InitServices(
@@ -40,6 +49,7 @@ func InitServices(
 	common domainService.CommonService,
 	redis domainService.RedisService,
 	trip domainService.TripService,
+	mqtt *mqtt.Client,
 ) *Services {
 	return &Services{
 		Account: account,
@@ -48,6 +58,7 @@ func InitServices(
 		Common:  common,
 		Redis:   redis,
 		Trip:    trip,
+		mqtt:    mqtt,
 	}
 }
 
@@ -92,4 +103,11 @@ func provideTripService(
 	redisRepo domainRepo.RedisRepository,
 ) domainService.TripService {
 	return trip.NewTripService(tripRepo, commonService, redisRepo)
+}
+func provideMqttHandler() mqtt.MessageHandler {
+	return mqttHandler.NewMQTTMessageHandler()
+}
+
+func provideMqtt(cfg model.Config, handler mqtt.MessageHandler) *mqtt.Client {
+	return initMethod.InitMqtt(cfg, handler)
 }

@@ -1,7 +1,8 @@
 package router
 
 import (
-	"PetTrack/infra/01-router/middleware"
+	router "PetTrack/infra/01-router"
+	middleware "PetTrack/infra/01-router/http/middleware"
 	"PetTrack/infra/02-handler/adapter"
 	"PetTrack/infra/02-handler/handler/account"
 	"PetTrack/infra/02-handler/handler/device"
@@ -16,8 +17,8 @@ import (
 
 func RegisterRoutes(r *gin.Engine) {
 
-	const ADMIN = middleware.PermAdmin
-	const MEMBER = middleware.PermMember
+	const ADMIN = router.PermAdmin
+	const MEMBER = router.PermMember
 
 	r.Use(
 		// TODO: 未來需要檢查
@@ -74,6 +75,6 @@ func executeHttp(handler func(request.RequestContext)) gin.HandlerFunc {
 	}
 }
 
-func identityRequired(identity middleware.Permission) gin.HandlerFunc {
-	return middleware.JWTMiddleware(identity)
+func identityRequired(identity router.Permission) gin.HandlerFunc {
+	return router.JWTMiddleware(identity)
 }

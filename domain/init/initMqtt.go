@@ -16,13 +16,14 @@ var (
 	subscribedTopics  = make(map[string]bool)
 )
 
-func InitMqtt(cfg model.Config) *mqtt.Client {
-	return initMqtt(cfg.Machines.MqttBroker.HostCloud, cfg.Machines.MqttBroker.Port, cfg.Machines.MqttBroker.User, cfg.Machines.MqttBroker.Password, cfg.Machines.MqttBroker.Topic)
+func InitMqtt(cfg model.Config, handler mqtt.MessageHandler) *mqtt.Client {
+	return initMqtt(cfg.Machines.MqttBroker.HostCloud, cfg.Machines.MqttBroker.Port,
+		cfg.Machines.MqttBroker.User, cfg.Machines.MqttBroker.Password,
+		cfg.Machines.MqttBroker.Topic, handler)
 }
 
 // InitMosquitto 初始化 MQTT 連線
-func initMqtt(host, port, username, password string, topics []string) *mqtt.Client {
-
+func initMqtt(host, port, username, password string, topics []string, handler mqtt.MessageHandler) *mqtt.Client {
 	clientId := "bunbun"
 
 	opts := mqtt.NewClientOptions().
@@ -32,7 +33,7 @@ func initMqtt(host, port, username, password string, topics []string) *mqtt.Clie
 		SetPassword(password).
 		SetKeepAlive(120 * time.Second).
 		SetPingTimeout(10 * time.Second).
-		SetDefaultPublishHandler(onMessageReceived).
+		SetDefaultPublishHandler(handler).
 		SetAutoReconnect(true).
 		SetConnectRetry(true).
 		SetConnectRetryInterval(5 * time.Second).
@@ -93,12 +94,4 @@ func onConnectionLost(client mqtt.Client, err error) {
 	// 更新連線狀態
 	global.IsConnected.Swap(false)
 	subscriptionMutex.Unlock()
-}
-
-func onMessageReceived(client mqtt.Client, msg mqtt.Message) {
-	payload := string(msg.Payload())
-	topic := msg.Topic()
-
-	logafa.Debug("收到 MQTT 訊息", "topic", topic, "payload", payload)
-	// ProcessMsg(payload, topic, client)
 }
